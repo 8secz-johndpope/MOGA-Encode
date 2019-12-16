@@ -1,0 +1,40 @@
+
+version: "2.3"
+services:
+    gen-alg:
+        container_name: moga-encode
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: oscar/moga-encode
+        network_mode: "host"
+        ipc: "host"
+        entrypoint: 'bash'
+        volumes:
+        - ../HRNet-mldata:/data
+        runtime: nvidia
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=all
+        working_dir: /MOGA-Encode
+        stdin_open: true
+        tty: true
+
+    hrnet:
+        container_name: hrnet
+        build:
+            context: ../HRNet
+            dockerfile: Dockerfile
+        image: oscar/hrnet
+        network_mode: "host"
+        ipc: "host"
+        volumes:
+        - ../HRNet-mldata:/data
+        runtime: nvidia
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=all
+        working_dir: /ml
+        stdin_open: true
+        tty: true
+        command: python tools/rest_communication.py
+
+

@@ -97,10 +97,12 @@ class sweetspot_problem:
             data = np.insert(data, 0, self.calls)
             data_writer.writerow(data)
         self.fitness_of_gen.append(fitness)
-        self.gen += 1
-        if( (len(self.fitness_of_gen) == cfg.POP_SIZE) and self.gen != 0):
+
+        # TODO: Fix so that no graph is made on the initial generation
+        if( (len(self.fitness_of_gen) == cfg.POP_SIZE)):
             pl.plot_front_from_fitness(self.fitness_of_gen, "gen "+str(self.gen))
             self.fitness_of_gen = []
+            self.gen += 1
 
 
     def get_bounds(self):

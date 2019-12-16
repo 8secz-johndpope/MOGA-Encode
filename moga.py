@@ -73,7 +73,6 @@ def sweetspot_search():
         # Initiate population
         pop = pyg.population(prob=opt_prob, seed=i*3+1)
         pop = uniform_bitrate_init(opt_prob, pop)
-        pl.plot_front_from_pop(pop, "initial population")
 
         # Set up optimization algorithm
         opt_alg = get_optimization_algorithm(opt_prob, i*3+1)

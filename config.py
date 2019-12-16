@@ -9,7 +9,7 @@ LOG_PATH = "logs/"
 CLI_VERBOSITY = "INFO"  # ERROR, WARNING, INFO, DEBUG
 
 # gen-alg parameters
-POP_SIZE = 4 * 2    # must be a multiple of 4!
+POP_SIZE = 4 * 3    # must be a multiple of 4 and larger than 5!
 NO_GENERATIONS = 10  
 MOG_ALG = "nsga2"   # nsga2, nspso, moead
 EPOCHS = 3

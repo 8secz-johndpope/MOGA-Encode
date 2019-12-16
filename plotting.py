@@ -42,10 +42,10 @@ def plot_front(ml_perf, comp_ratio, title):
     
     # Plot styling
     ax.set_title(plot_name)
-    ax.set_xlabel("ML-performance")
-    ax.set_ylabel("Compression ratio")
+    ax.set_ylabel("ML-performance")
+    ax.set_xlabel("Compression ratio")
     ax.grid(True)
-    #ax.set_xscale('log')
+    ax.set_xscale('log')
 
     # Save plot
     fig.savefig(cfg.PLOT_PATH + cfg.timestamp +  "/pf-" + title +".png", dpi=300, format='png')

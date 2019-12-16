@@ -1,0 +1,15 @@
+.git
+.idea
+.gitignore
+
+# Ignore some files and archives
+*.7z
+*.mbtree
+*.log
+
+# Ignore some directories
+/data
+/__pycache__
+/results
+/logs
+/tmp

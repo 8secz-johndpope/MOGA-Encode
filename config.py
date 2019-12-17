@@ -15,28 +15,29 @@ MOG_ALG = "nsga2"   # nsga2, nspso, moead
 EPOCHS = 3
 PLOT_PATH = "results/"
 FITNESS_DATA_PATH = "results/"
-ML_PERFORMANCE_BASELINE = 0.78 #TODO: update
+ML_PERFORMANCE_BASELINE = 0.76146 #TODO: update when using big model
 
 # optimization_problem parameters
 ML_DATA_INPUT = "/data/untouched_small/"  #TODO: use larger dataset
 ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
 OPTIMISATION_PARAMETERS = {  #TODO: Add more parameters
-    "bitrate": [2, 100],
+    "bitrate": [1, 50],
     "speed": [1, 3],
     "profile": [1, 3],
     "tune": [1, 4]
 }
+VIDEO_ENCODER = "libx264" # "h264_nvenc" "libx264"
+
 OPT_PARAMS = None      # Is set during gen-alg initiation
 OPT_HIGH_BOUNDS = None # Is set during gen-alg initiation
 OPT_LOW_BOUNDS = None  # Is set during gen-alg initiation
 
 # ffmpeg_utils parameters
-TEMP_STORAGE_PATH = "tmp/temp.mp4"
+TEMP_STORAGE_PATH = "/tmp/temp.mp4"
 IMAGE_TYPE = "png"
 NAMING_SCHEME =  '%06d'  # imgtype=png & scheme='%d' --> 1.png, 2.png, 3.png...
 IMG_COMP_LVL = 1
-MULTI_ENCODER = False
-VIDEO_ENCODER = "libx264" # "h264_nvenc" "libx264"
+
 
 # rest_communication parameters
 ML_ADDRESS = "http://localhost:5001"
@@ -66,3 +67,12 @@ def load_params_from_dict():
     OPT_LOW_BOUNDS = low_bounds
 
 load_params_from_dict()
+
+
+# Testing degrading quality with constant parameters
+ENCODER_DICT = ["libx264", "hevc_nvenc", "libvpx-vp9"]
+SWEETSPOT_PARAMS = {
+    "libx264": [2,2,2],
+    "hevc_nvenc": [2,2,2],
+    "libvpx-vp9": [2,2,2]
+}

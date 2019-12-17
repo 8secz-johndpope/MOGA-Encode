@@ -11,7 +11,9 @@ services:
         ipc: "host"
         entrypoint: 'bash'
         volumes:
-        - ../HRNet-mldata:/data
+            - ../HRNet-mldata:/data
+        tmpfs:
+            - /tmp
         runtime: nvidia
         environment:
             - NVIDIA_VISIBLE_DEVICES=all

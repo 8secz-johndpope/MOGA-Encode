@@ -12,7 +12,7 @@ import plotting as pl
 from optimization_problem import sweetspot_problem
 
 # Global logger object
-logger, start_time = None, None
+logger = None
 
 
 def get_optimization_algorithm(opt_prob, randseed):

@@ -27,6 +27,9 @@ def degrade_eval():
     original_img_size = ffmpeg_utils.get_directory_size(cfg.ML_DATA_INPUT)
 
     for encoder in cfg.ENCODER_DICT:
+        # Load the parameters for encoder
+        cfg.JSON_PARAM_PATH = encoder+"-parameters.json"
+        cfg.load_params_from_json()
 
         params = cfg.SWEETSPOT_PARAMS[encoder]
 

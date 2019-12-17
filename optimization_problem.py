@@ -95,12 +95,13 @@ class sweetspot_problem:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data = np.concatenate((fitness, x), axis=None)
             data = np.insert(data, 0, self.calls)
+            data = np.insert(data, 0, cfg.epoch)
             data_writer.writerow(data)
         self.fitness_of_gen.append(fitness)
 
         # TODO: Fix so that no graph is made on the initial generation
         if( (len(self.fitness_of_gen) == cfg.POP_SIZE)):
-            pl.plot_front_from_fitness(self.fitness_of_gen, "gen "+str(self.gen))
+            pl.plot_front_from_fitness(self.fitness_of_gen, "epoch " + str(cfg.epoch) +" gen "+str(self.gen))
             self.fitness_of_gen = []
             self.gen += 1
 

@@ -22,12 +22,12 @@ ML_PERFORMANCE_BASELINE = 0.76146 #TODO: update when using big model
 # optimization_problem parameters
 ML_DATA_INPUT = "/data/untouched_small/"  #TODO: use larger dataset
 ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
-JSON_PARAM_PATH = "x264-parameters.json"
+JSON_PARAM_PATH = "libx264-parameters.json"
 VIDEO_ENCODER = "libx264" # "h264_nvenc" "libx264"
 
 
 # ffmpeg_utils parameters
-TEMP_STORAGE_PATH = "/tmp/temp.mp4"
+TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
 IMAGE_TYPE = "png"
 NAMING_SCHEME =  '%06d'  # imgtype=png & scheme='%d' --> 1.png, 2.png, 3.png...
 IMG_COMP_LVL = 1

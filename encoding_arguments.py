@@ -29,7 +29,11 @@ def get_codec_args(decision_vector, encoder):
         output_args[param_name] = cfg.OPT_VALUES[param_name][vector_val]
 
     # Remove tune flag if no tuning parameter is passed
-    if(output_args["tune"] == "none"): del output_args["tune"]
+    try:
+        if(output_args["tune"] == "none"): del output_args["tune"]
+    except Exception:
+        logger.debug("No tune parameter found, continuing...")
+
 
     # Set the conditional arguments
     if(encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
@@ -62,6 +66,8 @@ def get_h264_nvenc_args(input_args, output_args, x):
 
 def get_hevc_nvenc_args(input_args, output_args, x):
     # TODO: check if special arguments are to be added
+    input_args["hwaccel"] = "nvdec"
+    output_args["b_ref_mode:v"]= "middle"
 
     return input_args, output_args, False
 

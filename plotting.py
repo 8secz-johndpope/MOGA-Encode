@@ -32,7 +32,7 @@ def plot_front(ml_perf, comp_ratio, title):
     Draws a scatter plot from ml_perf and comp_ratio data points.
     The plot is saved into a directory unique for the current optimization session.
     '''
-    logger.debug("Plotting front of " + title + " (epoch"+str(cfg.epoch)+")")
+    logger.debug("Plotting front of " + title)
     plot_name = "Fronteer of " + title
 
     # Draw plot
@@ -46,7 +46,7 @@ def plot_front(ml_perf, comp_ratio, title):
     ax.set_xlabel("Compression ratio")
     ax.grid(True)
     ax.set_xscale('log')
-    ax.set_xlim(xmin=0)
+    #ax.set_xlim(xmin=1, xmax=300)
     ax.set_ylim(ymin=0., ymax=1.0)
 
     # Save plot

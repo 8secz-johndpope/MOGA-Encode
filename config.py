@@ -1,4 +1,6 @@
 # By: Oscar Andersson 2019
+import json, logging
+logger = logging.getLogger('gen-alg')
 
 '''
 Contains constants and "static" variables which most modules use/share.
@@ -20,17 +22,9 @@ ML_PERFORMANCE_BASELINE = 0.76146 #TODO: update when using big model
 # optimization_problem parameters
 ML_DATA_INPUT = "/data/untouched_small/"  #TODO: use larger dataset
 ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
-OPTIMISATION_PARAMETERS = {  #TODO: Add more parameters
-    "bitrate": [1, 50],
-    "speed": [1, 3],
-    "profile": [1, 3],
-    "tune": [1, 4]
-}
+JSON_PARAM_PATH = "x264-parameters.json"
 VIDEO_ENCODER = "libx264" # "h264_nvenc" "libx264"
 
-OPT_PARAMS = None      # Is set during gen-alg initiation
-OPT_HIGH_BOUNDS = None # Is set during gen-alg initiation
-OPT_LOW_BOUNDS = None  # Is set during gen-alg initiation
 
 # ffmpeg_utils parameters
 TEMP_STORAGE_PATH = "/tmp/temp.mp4"
@@ -43,30 +37,37 @@ IMG_COMP_LVL = 1
 ML_ADDRESS = "http://localhost:5001"
 REQUEST_ADDRESS = ML_ADDRESS + "/eval" 
 
+
 # These are global variables, DO NOT CHANGE
 timestamp = None
 epoch = None
 
+# Optimisation parameters
+OPT_PARAMS = []
+OPT_HIGH_BOUNDS = []
+OPT_LOW_BOUNDS = []
+OPT_VALUES = {}
 
-def load_params_from_dict():
+def load_params_from_json():
     '''
     Load optimisation parameters and bounds from dictionary
     '''
-    global OPT_PARAMS, OPT_HIGH_BOUNDS, OPT_LOW_BOUNDS
-    params = []
-    low_bounds = []
-    high_bounds = []
+    global OPT_PARAMS, OPT_HIGH_BOUNDS, OPT_LOW_BOUNDS, OPT_VALUES
+    
+    json_params = None
+    with open(JSON_PARAM_PATH, 'r') as f:
+        json_params = json.load(f)
+    
+    param_bounds = json_params["bounds"]
+    OPT_VALUES = json_params["values"]
 
-    for param in OPTIMISATION_PARAMETERS:
-        params.append(param)
-        low_bounds.append(OPTIMISATION_PARAMETERS[param][0])
-        high_bounds.append(OPTIMISATION_PARAMETERS[param][-1])
+    for param in param_bounds:
+        OPT_PARAMS.append(param)
+        OPT_LOW_BOUNDS.append(param_bounds[param][0])
+        OPT_HIGH_BOUNDS.append(param_bounds[param][1])
+    logger.debug("Params loaded: " + str(OPT_PARAMS))
 
-    OPT_PARAMS = params
-    OPT_HIGH_BOUNDS = high_bounds
-    OPT_LOW_BOUNDS = low_bounds
-
-load_params_from_dict()
+load_params_from_json()
 
 
 # Testing degrading quality with constant parameters

@@ -7,15 +7,34 @@ import config as cfg
 logger = logging.getLogger('gen-alg')
 
 
-def img_to_vid(images_dir, input_args, output_args):
+def img_to_vid(images_dir, decision_vector, encoder):
     '''
     Converts images of a directory to a video-file
     '''
+
+    input_args, output_args, is_two_pass = get_codec_args(decision_vector, encoder)
 
     logger.debug("Img -> Vid")
     logger.debug(str(input_args)+ " " +str(output_args))
     filenaming = str(images_dir+'/'+'*.'+ cfg.IMAGE_TYPE)
     out_path = cfg.TEMP_STORAGE_PATH
+
+    if(is_two_pass):
+        try:
+            logger.debug("Applying two passes!")
+            output_args["pass"] = "1"
+            (
+                ffmpeg
+                .input(filenaming, **input_args)
+                .output("/dev/null", **output_args)
+                .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-y")
+                .run()
+            )
+            output_args["pass"] = "2"
+        except Exception as ex:
+            logger.critical(ex)
+            logger.critical("FFMPEG: error converting images to video")
+            exit(1)
 
     try:
         (
@@ -55,7 +74,7 @@ def vid_to_img(images_dir):
         exit(1)
 
 
-def transcode(img_path, output_dir, x, encoder="NA"):
+def transcode(img_path, output_dir, decision_vector, encoder="NA"):
     '''
     Handles the process of transcoding images -> compressed-video -> images
     with potential compression artifacts.
@@ -67,9 +86,8 @@ def transcode(img_path, output_dir, x, encoder="NA"):
         os.mkdir(output_dir)
 
     filenames = get_names(img_path)
-    input_args, output_args = get_codec_args(x, encoder)
 
-    img_to_vid(img_path, input_args, output_args)
+    img_to_vid(img_path, decision_vector, encoder)
     vid_to_img(output_dir)
 
     vid_size = os.path.getsize(cfg.TEMP_STORAGE_PATH)

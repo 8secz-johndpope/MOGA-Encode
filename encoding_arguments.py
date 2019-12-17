@@ -1,16 +1,13 @@
 # By: Oscar Andersson 2019
 import logging
 logger = logging.getLogger('gen-alg')
+import config as cfg
 
-def get_codec_args(x, encoder):
+def get_codec_args(decision_vector, encoder):
     '''
     Sets input and output arguments for encoding according to the
     decision vector "x" and the encoder.
     '''
-    # TODO: Check if x can be used directly
-    x_new = []
-    for x_i in x:
-        x_new.append(str(int(x_i)))
 
     # Set the constant arguments 
     input_args = {
@@ -19,87 +16,79 @@ def get_codec_args(x, encoder):
     }
     output_args = {
         "c:v": encoder,
-        'b:v':  x_new[0] + "M",
-        'pass': "1",
+        'b:v':  str(int(decision_vector[0])) + "M",
         "format": 'mp4',
         'pix_fmt': 'yuv420p' # ?????? TODO: Look over
     }
 
+    for i in range(1, len(cfg.OPT_PARAMS)):
+        vector_val = int(decision_vector[i])
+        param_name = cfg.OPT_PARAMS[i]
+        logger.debug("Adding encoding argument:  Param_name: " + param_name +
+                     " vectorval: " + cfg.OPT_VALUES[param_name][vector_val])
+        output_args[param_name] = cfg.OPT_VALUES[param_name][vector_val]
+
+    # Remove tune flag if no tuning parameter is passed
+    if(output_args["tune"] == "none"): del output_args["tune"]
+
     # Set the conditional arguments
-    if(encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, x_new)
-    elif(encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, x_new)
-    elif(encoder == "libx264"): return get_libx264_args(input_args, output_args, x_new)
-    elif(encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, x_new)
-    elif(encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, x_new)
-    elif(encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, x_new)
-    elif(encoder == "libaomav1"): return get_libaomav1_args(input_args, output_args, x_new)
+    if(encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
+    elif(encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
+    elif(encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
+    elif(encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
+    elif(encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
+    elif(encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, decision_vector)
+    elif(encoder == "libaomav1"): return get_libaomav1_args(input_args, output_args, decision_vector)
     else: raise Exception("Could not find codec")
 
 
-# TODO: fix
+
 def get_libx264_args(input_args, output_args, x):
-    speed_switcher = {"1": "slow", "2": "medium", "3": "fast"}
-    profile_switcher = {"1": "baseline", "2": "main", "3": "high"}
-    tune_switcher = {"1": "none", "2": "stillimage", "3": "film", "4": "grain"}
+    output_args["maxrate"] = str(x[0])+"M"
+    output_args["minrate"] = str(x[0])+"M"
 
+    # Checks if one or two passes are to be done
+    is_two_pass = True if output_args["pass"]=="2" else False
+    del output_args["pass"]
 
-    output_args["maxrate"] = x[0]+"M"
-    output_args["minrate"] = x[0]+"M"
-    output_args["preset"] = speed_switcher[x[1]]
-    output_args["profile"] = profile_switcher[x[2]]
-    if(tune_switcher[x[3]] != "none"): output_args["tune"] = tune_switcher[x[3]]
-    return input_args, output_args
+    return input_args, output_args, is_two_pass
+
 
 def get_h264_nvenc_args(input_args, output_args, x):
-    speed_switcher = {"1": "slow", "2": "medium", "3": "fast"}
-    profile_switcher = {"1": "baseline", "2": "main", "3": "high"}
-    tune_switcher = {"1": "none", "2": "stillimage", "3": "film", "4": "grain"}
+    # TODO: check if special arguments are to be added
 
-    output_args["preset"] = speed_switcher[x[1]]
-    output_args["profile"] = profile_switcher[x[2]]
-    if(tune_switcher[x[3]] != "none"): output_args["tune"] = tune_switcher[x[3]]
-    return input_args, output_args
+    return input_args, output_args, False
+
 
 def get_hevc_nvenc_args(input_args, output_args, x):
-    speed_switcher = {"1": "slow", "2": "medium", "3": "fast"}
-    profile_switcher = {"1": "baseline", "2": "main", "3": "high"}
+    # TODO: check if special arguments are to be added
 
-    output_args["preset"] = speed_switcher[x[1]]
-    output_args["profile"] = profile_switcher[x[2]]
-    return input_args, output_args
+    return input_args, output_args, False
 
-# TODO: fix
+
 def get_h264_vaapi_args(input_args, output_args, x):
-    speed_switcher = {"1": "slow", "2": "medium", "3": "fast"}
-    profile_switcher = {"1": "baseline", "2": "main", "3": "high"}
-
+    # TODO: check if more special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
-    output_args["preset"] = speed_switcher[x[1]]
-    output_args["profile"] = profile_switcher[x[2]]
-    return input_args, output_args
+    return input_args, output_args, False
 
-# TODO: fix
+
 def get_libvpxvp9_args(input_args, output_args, x):
-    speed_switcher = {"1": "best", "2": "good", "3": "realtime"}
+    # TODO: check if special arguments are to be added
 
-    output_args["deadline"] = speed_switcher[x[1]]
-    return input_args, output_args
+    return input_args, output_args, False
 
-# TODO: fix
+
 def get_vp9_vaapi_args(input_args, output_args, x):
-    speed_switcher = {"1": "slow", "2": "medium", "3": "fast"}
-    profile_switcher = {"1": "baseline", "2": "main", "3": "high"}
-
+    # TODO: check if special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
-    output_args["preset"] = speed_switcher[x[1]]
-    output_args["profile"] = profile_switcher[x[2]]
-    return input_args, output_args
+    return input_args, output_args, False
 
-# TODO: fix
+
 def get_libaomav1_args(input_args, output_args, x):
+    # TODO: check if special arguments are to be added
     output_args["rom-mt"] = "1"
     output_args["tiles"] = "2x2"
-    return input_args, output_args
+    return input_args, output_args, False
 
 def apply_vaapi_input_args(input_args):
     input_args["hwaccel"] = "vaapi"

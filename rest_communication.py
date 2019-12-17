@@ -33,3 +33,4 @@ def get_eval_from_ml_alg():
 if(__name__ == "__main__"):  
     # Main function for debugging communication
     eval_res = get_eval_from_ml_alg()
+    print(eval_res)

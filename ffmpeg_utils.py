@@ -27,13 +27,13 @@ def img_to_vid(images_dir, decision_vector, encoder):
                 ffmpeg
                 .input(filenaming, **input_args)
                 .output("/dev/null", **output_args)
-                .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-y")
-                .run()
+                .global_args('-loglevel', 'warning', "-stats", "-hide_banner", "-y")
+                .run(capture_stderr=True)
             )
             output_args["pass"] = "2"
-        except Exception as ex:
-            logger.critical(ex)
+        except ffmpeg.Error as ex:
             logger.critical("FFMPEG: error converting images to video")
+            logger.critical(ex.stderr.decode('utf8'))
             exit(1)
 
     try:
@@ -41,12 +41,12 @@ def img_to_vid(images_dir, decision_vector, encoder):
             ffmpeg
             .input(filenaming, **input_args)
             .output(out_path, **output_args)
-            .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-y")
-            .run()
+            .global_args('-loglevel', 'warning', "-stats", "-hide_banner", "-y")
+            .run(capture_stderr=True)
         )
-    except Exception as ex:
-        logger.critical(ex)
+    except ffmpeg.Error as ex:
         logger.critical("FFMPEG: error converting images to video")
+        logger.critical(ex.stderr.decode('utf8'))
         exit(1)
     return True
 
@@ -70,13 +70,13 @@ def vid_to_vid(img_dir, decision_vector, encoder):
                 ffmpeg
                 .input(in_path)
                 .output("/dev/null", **output_args)
-                .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-y")
-                .run()
+                .global_args('-loglevel', 'warning', "-stats", "-hide_banner", "-y")
+                .run(capture_stderr=True)
             )
             output_args["pass"] = "2"
-        except Exception as ex:
-            logger.critical(ex)
+        except ffmpeg.Error as ex:
             logger.critical("FFMPEG: error converting images to video")
+            logger.critical(ex.stderr.decode('utf8'))
             exit(1)
 
     try:
@@ -84,12 +84,12 @@ def vid_to_vid(img_dir, decision_vector, encoder):
             ffmpeg
             .input(in_path)
             .output(out_path, **output_args)
-            .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-y")
-            .run()
+            .global_args('-loglevel', 'warning', "-stats", "-hide_banner", "-y")
+            .run(capture_stderr=True)
         )
-    except Exception as ex:
-        logger.critical(ex)
+    except ffmpeg.Error as ex:
         logger.critical("FFMPEG: error converting images to video")
+        logger.critical(ex.stderr.decode('utf8'))
         exit(1)
     return True
 
@@ -108,12 +108,12 @@ def vid_to_img(images_dir):
             ffmpeg
             .input(file_dir)
             .output(filenaming, compression_level=cfg.IMG_COMP_LVL)  # PNG: comp_lvl 1 seems to be fast yet small enough
-            .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-y")
-            .run()
+            .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-y")
+            .run(capture_stderr=True)
         )
-    except Exception as ex:
-        logger.critical(ex)
+    except ffmpeg.Error as ex:
         logger.critical("FFMPEG: error converting video to images")
+        logger.critical(ex.stderr.decode('utf8'))
         exit(1)
 
 
@@ -131,6 +131,7 @@ def transcode(img_path, output_dir, decision_vector, encoder="NA"):
     filenames = get_names(img_path)
 
     img_to_vid(img_path, decision_vector, encoder)
+    #vid_to_vid(img_path, decision_vector, encoder)
     vid_to_img(output_dir)
 
     vid_size = os.path.getsize(cfg.TEMP_STORAGE_PATH)
@@ -209,14 +210,14 @@ def loss_test():
         ffmpeg
         .input(original_image)
         .output("output_img100.png", compression_level=100)
-        .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-nostats")
+        .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-nostats")
         .run()
     )
     (
         ffmpeg
         .input(original_image)
         .output("output_img0.png", compression_level=0)
-        .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-nostats")
+        .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-nostats")
         .run()
     )
     (

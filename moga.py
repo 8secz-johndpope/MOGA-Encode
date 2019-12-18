@@ -124,7 +124,7 @@ def configure_logging():
     # Logfiles will contain full debug information
     file_log = logging.FileHandler(filename=cfg.LOG_PATH+cfg.timestamp+'.log')
     file_log.setLevel(logging.DEBUG)   
-    file_log.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    file_log.setFormatter(logging.Formatter('Time: %(asctime)s  Level: %(levelname)s\n%(message)s\n'))
 
     # Less information is printed into the console
     cli_log = logging.StreamHandler()

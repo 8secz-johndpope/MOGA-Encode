@@ -51,4 +51,6 @@ def plot_front(ml_perf, comp_ratio, title):
 
     # Save plot
     fig.savefig(cfg.PLOT_PATH + cfg.timestamp +  "/pf-" + title +".png", dpi=300, format='png')
+    plt.close(fig)
+#    plt.close('all')
     

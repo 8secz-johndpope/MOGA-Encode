@@ -69,6 +69,7 @@ class sweetspot_problem:
         comp_size = 0
 
         # Apply degredation to every clip
+        logger.info("Starting trancode process")
         for clip in clips:
             input_clip_dir = cfg.ML_DATA_INPUT + clip
             output_clip_dir = cfg.ML_DATA_OUTPUT + clip

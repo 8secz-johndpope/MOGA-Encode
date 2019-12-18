@@ -81,7 +81,7 @@ def sweetspot_search():
         logger.debug("Starting evolution process")
         pop = opt_alg.evolve(pop)
 
-        log_stats(pop)
+        #log_stats(pop)
 
 
 
@@ -95,6 +95,7 @@ def log_stats(pop):
     mean_cd = []
 
     ndf, dl, dc, ndr  = pyg.fast_non_dominated_sorting(fits)
+
     logger.info("Non-dominated front")
     for nd in ndf:
         logger.info("Vector: " + str(vectors[nd]) +"\Fitness: " + str(fits[nd]))

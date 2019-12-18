@@ -27,7 +27,7 @@ def img_to_vid(images_dir, decision_vector, encoder):
                 ffmpeg
                 .input(filenaming, **input_args)
                 .output("/dev/null", **output_args)
-                .global_args('-loglevel', 'warning', "-stats", "-hide_banner", "-y")
+                .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-y")
                 .run(capture_stderr=True)
             )
             output_args["pass"] = "2"
@@ -41,7 +41,7 @@ def img_to_vid(images_dir, decision_vector, encoder):
             ffmpeg
             .input(filenaming, **input_args)
             .output(out_path, **output_args)
-            .global_args('-loglevel', 'warning', "-stats", "-hide_banner", "-y")
+            .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-y")
             .run(capture_stderr=True)
         )
     except ffmpeg.Error as ex:
@@ -70,7 +70,7 @@ def vid_to_vid(img_dir, decision_vector, encoder):
                 ffmpeg
                 .input(in_path)
                 .output("/dev/null", **output_args)
-                .global_args('-loglevel', 'warning', "-stats", "-hide_banner", "-y")
+                .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-y")
                 .run(capture_stderr=True)
             )
             output_args["pass"] = "2"
@@ -84,7 +84,7 @@ def vid_to_vid(img_dir, decision_vector, encoder):
             ffmpeg
             .input(in_path)
             .output(out_path, **output_args)
-            .global_args('-loglevel', 'warning', "-stats", "-hide_banner", "-y")
+            .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-y")
             .run(capture_stderr=True)
         )
     except ffmpeg.Error as ex:

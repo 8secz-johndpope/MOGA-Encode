@@ -23,15 +23,29 @@ class sweetspot_problem:
     gen = 0
     fitness_of_gen = []
 
+
     def __init__(self):
         self.original_img_size = ffmpeg_utils.get_directory_size(cfg.ML_DATA_INPUT)
+
 
     def get_name(self):
         return "Sweetspot problem"
 
+
     def get_nobj(self):
     # Multi objective optimization (2 objectives)
         return 2
+
+
+    def get_bounds(self):
+    # Return the problem's bound-box
+        return (cfg.OPT_LOW_BOUNDS, cfg.OPT_HIGH_BOUNDS)     # [Low-bounds], [high-bounds]
+
+
+    def get_nix(self):
+    # Return the no integer dimensions of problem
+        return len(cfg.OPT_PARAMS)
+
 
     def fitness(self, x):
         '''
@@ -69,12 +83,15 @@ class sweetspot_problem:
         comp_size = 0
 
         # Apply degredation to every clip
+        start_time = time.time()
         logger.info("Starting trancode process")
         for clip in clips:
             input_clip_dir = cfg.ML_DATA_INPUT + clip
             output_clip_dir = cfg.ML_DATA_OUTPUT + clip
             logger.debug("Applying degredation to clip: " + input_clip_dir)
             comp_size += ffmpeg_utils.transcode(input_clip_dir, output_clip_dir, x)
+        transcode_time = time.time() - start_time
+        logger.info("Time for transcode: " + str(int(transcode_time))+" seconds")
 
         # Retrieve fitness results
         score = float(rest_communication.get_eval_from_ml_alg())    # Get ML-algorithm results 
@@ -86,6 +103,7 @@ class sweetspot_problem:
 
         # Minimize bitrate, maximize ML-performance
         return [-score, -comp_ratio]  # maximize obj-func -> put a minus sign in front of obj.
+
 
     def store_results(self, x, fitness):
         '''
@@ -100,20 +118,27 @@ class sweetspot_problem:
             data_writer.writerow(data)
         self.fitness_of_gen.append(fitness)
 
-        # TODO: Fix so that no graph is made on the initial generation
         if( (len(self.fitness_of_gen) == cfg.POP_SIZE)):
-            pl.plot_front_from_fitness(self.fitness_of_gen, "epoch " + str(cfg.epoch) +" gen "+str(self.gen))
+
+            # If this is the last generation, plot and print extended epoch information
+            if(self.gen == cfg.NO_GENERATIONS):
+                logger.info("Last generation, collecting the fitness of all decision vectors evaluated")
+                fitness_keys = [ key for key in self.fitness_dict.keys() ]
+                fitness_values = [ val for val in self.fitness_dict.values() ]
+                _, _, dc, ndr  = pyg.fast_non_dominated_sorting(fitness_values)
+                ndf = pyg.non_dominated_front_2d(fitness_values)
+                logger.info("Non dominated vectors: "+str(len(ndf)) + "\nDomination count: " + str(dc) +"\nNon domination ranks: " + str(ndr))
+                pl.plot_front("epoch " + str(cfg.epoch) +" all fits", fitness_values, ndf)
+                
+                # Save ndf results to file
+                with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/ndf-epoch'+str(cfg.epoch)+'.csv', mode='w') as data_file:
+                    data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    for i in ndf:
+                        data = np.concatenate((fitness_keys[i], fitness_values[i]), axis=None)
+                        data_writer.writerow(data)
+
+            # Plot generation specific information
+            pl.plot_front("epoch " + str(cfg.epoch) +" gen "+str(self.gen), self.fitness_of_gen)
             self.fitness_of_gen = []
             self.gen += 1
-
-
-    def get_bounds(self):
-    # Return the problem's bound-box
-        return (cfg.OPT_LOW_BOUNDS, cfg.OPT_HIGH_BOUNDS)     # [Low-bounds], [high-bounds]
-
-    def get_nix(self):
-    # Return the no integer dimensions of problem
-        return len(cfg.OPT_PARAMS)
-
-
 

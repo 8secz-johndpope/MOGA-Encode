@@ -11,8 +11,8 @@ LOG_PATH = "logs/"
 CLI_VERBOSITY = "INFO"  # ERROR, WARNING, INFO, DEBUG
 
 # gen-alg parameters
-POP_SIZE = 4 * 3    # must be a multiple of 4 and larger than 5!
-NO_GENERATIONS = 10  
+POP_SIZE = 4 * 4    # must be a multiple of 4 and larger than 5!
+NO_GENERATIONS = 30
 MOG_ALG = "nsga2"   # nsga2, nspso, moead
 EPOCHS = 3
 PLOT_PATH = "results/"
@@ -77,7 +77,7 @@ load_params_from_json()
 # Testing degrading quality with constant parameters
 ENCODER_DICT = ["libx264", "hevc_nvenc", "libvpx-vp9"]
 SWEETSPOT_PARAMS = {
-    "libx264": [2,2,2],
-    "hevc_nvenc": [2,2,2],
+    "libx264": [2,2,2,1],
+    "hevc_nvenc": [1,1],
     "libvpx-vp9": [2,2,2]
 }

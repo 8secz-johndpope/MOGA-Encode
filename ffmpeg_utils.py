@@ -50,6 +50,49 @@ def img_to_vid(images_dir, decision_vector, encoder):
         exit(1)
     return True
 
+def vid_to_vid(img_dir, decision_vector, encoder):
+    '''
+    Converts images of a directory to a video-file
+    '''
+
+    _, output_args, is_two_pass = get_codec_args(decision_vector, encoder)
+
+    logger.debug("Vid -> Vid")
+    logger.debug(str(output_args))
+    in_path = img_dir + "/ll.mkv"
+    out_path = cfg.TEMP_STORAGE_PATH
+
+    if(is_two_pass):
+        try:
+            logger.debug("Applying two passes!")
+            output_args["pass"] = "1"
+            (
+                ffmpeg
+                .input(in_path)
+                .output("/dev/null", **output_args)
+                .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-y")
+                .run()
+            )
+            output_args["pass"] = "2"
+        except Exception as ex:
+            logger.critical(ex)
+            logger.critical("FFMPEG: error converting images to video")
+            exit(1)
+
+    try:
+        (
+            ffmpeg
+            .input(in_path)
+            .output(out_path, **output_args)
+            .global_args('-loglevel', 'quiet', "-stats", "-hide_banner", "-y")
+            .run()
+        )
+    except Exception as ex:
+        logger.critical(ex)
+        logger.critical("FFMPEG: error converting images to video")
+        exit(1)
+    return True
+
 
 def vid_to_img(images_dir):
     '''
@@ -111,7 +154,8 @@ def get_names(img_path):
     files = []
     for f in os.listdir(img_path):
         if os.path.isfile(os.path.join(img_path, f)):
-            files.append(f)
+            if f.endswith('.'+ cfg.IMAGE_TYPE):
+                files.append(f)
     files.sort()
     return files
 

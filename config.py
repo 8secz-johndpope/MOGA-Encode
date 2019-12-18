@@ -42,10 +42,10 @@ timestamp = None
 epoch = None
 
 # Optimisation parameters
-OPT_PARAMS = []
-OPT_HIGH_BOUNDS = []
-OPT_LOW_BOUNDS = []
-OPT_VALUES = {}
+OPT_PARAMS = None
+OPT_HIGH_BOUNDS = None
+OPT_LOW_BOUNDS = None
+OPT_VALUES = None
 
 def load_params_from_json():
     '''
@@ -53,6 +53,11 @@ def load_params_from_json():
     '''
     global OPT_PARAMS, OPT_HIGH_BOUNDS, OPT_LOW_BOUNDS, OPT_VALUES
     
+    OPT_PARAMS = []
+    OPT_HIGH_BOUNDS = []
+    OPT_LOW_BOUNDS = []
+    OPT_VALUES = {}
+
     json_params = None
     with open(JSON_PARAM_PATH, 'r') as f:
         json_params = json.load(f)

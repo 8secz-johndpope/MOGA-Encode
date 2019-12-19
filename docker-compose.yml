@@ -12,6 +12,7 @@ services:
         entrypoint: 'bash'
         volumes:
             - ../HRNet-mldata:/data
+            - ../output:/output
         tmpfs:
             - /tmp
         runtime: nvidia

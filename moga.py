@@ -23,7 +23,7 @@ def get_optimization_algorithm(opt_prob, randseed):
     if(cfg.MOG_ALG == "nsga2"):
         # cr: crossover probability, m: mutation probability
         # eta_c: distribution index for crossover, eta_m: distribution index for mutation
-        opt_alg = pyg.algorithm( pyg.nsga2(gen=cfg.NO_GENERATIONS, cr=0.7, m=0.15,
+        opt_alg = pyg.algorithm( pyg.nsga2(gen=cfg.NO_GENERATIONS, cr=0.85, m=0.15,
                                            eta_c=10, eta_m=50, seed=randseed) )
         opt_alg.set_verbosity(1)
     elif(cfg.MOG_ALG == "moead"):
@@ -114,9 +114,10 @@ def configure_logging():
     '''
     global logger
 
-    # Create directory for storing results from this session
-    if not os.path.isdir(cfg.PLOT_PATH + cfg.timestamp):
-        os.mkdir(cfg.PLOT_PATH + cfg.timestamp)
+    # Check/prepare directories for storing data from this session
+    if not os.path.isdir(cfg.PLOT_PATH): os.mkdir(cfg.PLOT_PATH) 
+    if not os.path.isdir(cfg.LOG_PATH): os.mkdir(cfg.LOG_PATH)
+    if not os.path.isdir(cfg.PLOT_PATH + cfg.timestamp): os.mkdir(cfg.PLOT_PATH + cfg.timestamp)
 
     # create logger
     logger = logging.getLogger('gen-alg')

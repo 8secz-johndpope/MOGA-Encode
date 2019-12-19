@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
-import logging
+import pygmo as pyg
+import logging, csv, argparse
 import config as cfg
 logger = logging.getLogger('gen-alg')
 
@@ -42,13 +43,36 @@ def plot_front(title, fitness, ndf=[]):
 
     plt.close(fig)
 
+def plot_from_csv(filepath, title, perf_index, comp_index, add_ndf):
+    '''
+    Read data from csv file and redirect fitness data to plot_front function.
+    '''
+
+    fitness = []
+    ndf = []
+
+    with open(filepath) as csv_file:
+        csv_data = csv.reader(csv_file, delimiter=',')
+        for row in csv_data:
+            fitness.append( [float(row[perf_index]), float(row[comp_index])] )
+
+    if add_ndf: ndf = pyg.non_dominated_front_2d(fitness)
+
+    plot_front(title, fitness, ndf)
+
 
 if(__name__ == "__main__"):
     '''
-    Create simple plot for styling purposes
+    Create plots from files
     '''
     cfg.timestamp = ""
-    title = "Test"
-    fitness = [[-0.9,-10],[-0.7,-25],[-0.35,-20],[-0.2,-30], [-0.25,-50]]
-    ndf = [0,1,4]
-    plot_front(title, fitness, ndf)
+
+    parser = argparse.ArgumentParser(description='Plot front from file data')
+    parser.add_argument('filepath', help="path to the csv file containing fitness data")
+    parser.add_argument('-n', '--name', default="Plot", help="name of plot")
+    parser.add_argument('-p', '--perf', type=int, default=2, help="index of ml-perf column")
+    parser.add_argument('-c', '--comp', type=int, default=3, help="index of comp-rate column")
+    parser.add_argument('--ndf', action="store_true", help="set flag to separate dominated and non dominated fits")
+
+    args = parser.parse_args()
+    plot_from_csv(args.filepath, args.name, args.perf, args.comp, args.ndf)

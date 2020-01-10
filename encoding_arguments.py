@@ -28,11 +28,6 @@ def get_codec_args(decision_vector, encoder):
                      " vectorval: " + cfg.opt_values[param_name][vector_val])
         output_args[param_name] = cfg.opt_values[param_name][vector_val]
 
-    # Remove tune flag if no tuning parameter is passed
-    try:
-        if(output_args["tune"] == "none"): del output_args["tune"]
-    except Exception:
-        logger.debug("No tune parameter found, continuing...")
 
 
     # Set the conditional arguments
@@ -51,6 +46,12 @@ def get_codec_args(decision_vector, encoder):
 def get_libx264_args(input_args, output_args, x):
     output_args["maxrate"] = str(x[0])+"M"
     output_args["minrate"] = str(x[0])+"M"
+
+    # Remove tune flag if no tuning parameter is passed
+    try:
+        if(output_args["tune"] == "none"): del output_args["tune"]
+    except Exception:
+        logger.debug("No tune parameter found, continuing...")
 
     # Checks if one or two passes are to be done
     is_two_pass = True if output_args["pass"]=="2" else False
@@ -94,12 +95,19 @@ def get_vp9_vaapi_args(input_args, output_args, x):
 def get_libvpxvp9_args(input_args, output_args, x):
     # TODO: check if special arguments are to be added
 
-    return input_args, output_args, True
+    # Checks if one or two passes are to be done
+    is_two_pass = True if output_args["pass"]=="2" else False
+    del output_args["pass"]
+
+    output_args["row-mt"] = "1"
+    output_args["tiles"] = "2x2"
+
+    return input_args, output_args, is_two_pass
 
 
 def get_libaomav1_args(input_args, output_args, x):
     # TODO: check if special arguments are to be added
-    output_args["rom-mt"] = "1"
+    output_args["row-mt"] = "1"
     output_args["tiles"] = "2x2"
     return input_args, output_args, False
 

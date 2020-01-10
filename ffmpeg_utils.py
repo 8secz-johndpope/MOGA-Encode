@@ -123,7 +123,7 @@ def transcode(img_path, output_dir, decision_vector, encoder="NA"):
     with potential compression artifacts.
     The function returns the file size of the compressed-video
     '''
-    if(encoder == "NA"): encoder = cfg.VIDEO_ENCODER
+    if(encoder == "NA"): encoder = cfg.video_encoder
 
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)

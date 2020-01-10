@@ -19,6 +19,7 @@ class sweetspot_problem:
 
     calls = 0
     fitness_dict = {}
+    times = {}
     original_img_size = None
     gen = 0
     fitness_of_gen = []
@@ -39,12 +40,12 @@ class sweetspot_problem:
 
     def get_bounds(self):
     # Return the problem's bound-box
-        return (cfg.OPT_LOW_BOUNDS, cfg.OPT_HIGH_BOUNDS)     # [Low-bounds], [high-bounds]
+        return (cfg.opt_low_bounds, cfg.opt_high_bounds)     # [Low-bounds], [high-bounds]
 
 
     def get_nix(self):
     # Return the no integer dimensions of problem
-        return len(cfg.OPT_PARAMS)
+        return len(cfg.opt_params)
 
 
     def fitness(self, x):
@@ -62,7 +63,7 @@ class sweetspot_problem:
 
         if x_id in self.fitness_dict:
             logger.info("Using previous fitness of identical input vector")
-            self.store_results(x, self.fitness_dict[x_id])
+            self.store_results(x, self.fitness_dict[x_id], self.times[x_id])
             return self.fitness_dict[x_id]
 
         # List all clips to degrade
@@ -99,26 +100,29 @@ class sweetspot_problem:
         logger.info("ML-performance: " + str(score) + "\nComp-ratio: " + str(comp_ratio))
 
         self.fitness_dict[x_id] = [-score, -comp_ratio]
-        self.store_results(x, [-score, -comp_ratio])
+        self.times[x_id] = transcode_time
+        self.store_results(x, [-score, -comp_ratio], transcode_time)
 
         # Minimize bitrate, maximize ML-performance
         return [-score, -comp_ratio]  # maximize obj-func -> put a minus sign in front of obj.
 
 
-    def store_results(self, x, fitness):
+    def store_results(self, x, fitness, time):
         '''
         Stores decision vectors and their fitness.
         Plots the fitness of all chromosomes of every generation.
         '''
         with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/data.csv', mode='a') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data = np.concatenate((fitness, x), axis=None)
-            data = np.insert(data, 0, self.calls)
-            data = np.insert(data, 0, cfg.epoch)
+            data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.mog_alg, str(x), str(time)]
+            data = np.concatenate((data, fitness), axis=None)
             data_writer.writerow(data)
         self.fitness_of_gen.append(fitness)
 
         if( (len(self.fitness_of_gen) == cfg.POP_SIZE)):
+
+            # Name used to identify plots and files
+            name = ("Epoch: " + str(cfg.epoch) + " MOGA: " + cfg.mog_alg + " Codec: " + cfg.video_encoder)
 
             # If this is the last generation, plot and print extended epoch information
             if(self.gen == cfg.NO_GENERATIONS):
@@ -127,8 +131,9 @@ class sweetspot_problem:
                 fitness_values = [ val for val in self.fitness_dict.values() ]
                 _, _, dc, ndr  = pyg.fast_non_dominated_sorting(fitness_values)
                 ndf = pyg.non_dominated_front_2d(fitness_values)
-                logger.info("Non dominated vectors: "+str(len(ndf)) + "\nDomination count: " + str(dc) +"\nNon domination ranks: " + str(ndr))
-                pl.plot_front("epoch " + str(cfg.epoch) +" all fits", fitness_values, ndf)
+                
+                logger.info(name + "\nNon dominated vectors: "+str(len(ndf)) + "\nDomination count: " + str(dc) +"\nNon domination ranks: " + str(ndr))
+                pl.plot_front(name +" all fits", fitness_values, ndf)
                 
                 # Save ndf results to file
                 with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/ndf-epoch'+str(cfg.epoch)+'.csv', mode='w') as data_file:
@@ -138,7 +143,7 @@ class sweetspot_problem:
                         data_writer.writerow(data)
 
             # Plot generation specific information
-            pl.plot_front("epoch " + str(cfg.epoch) +" gen "+str(self.gen), self.fitness_of_gen)
+            pl.plot_front(name +" gen "+str(self.gen), self.fitness_of_gen)
             self.fitness_of_gen = []
             self.gen += 1
 

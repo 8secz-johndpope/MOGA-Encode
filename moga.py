@@ -3,7 +3,7 @@
 # Imports
 import pygmo as pyg
 import numpy as np
-import random, logging, os
+import random, logging, os, argparse
 from datetime import datetime
 
 # Import modules
@@ -20,18 +20,18 @@ def get_optimization_algorithm(opt_prob, randseed):
     Returns an optimisation algorithm
     '''
     opt_alg = None
-    if(cfg.MOG_ALG == "nsga2"):
+    if(cfg.mog_alg == "nsga2"):
         # cr: crossover probability, m: mutation probability
         # eta_c: distribution index for crossover, eta_m: distribution index for mutation
         opt_alg = pyg.algorithm( pyg.nsga2(gen=cfg.NO_GENERATIONS, cr=0.85, m=0.15,
                                            eta_c=10, eta_m=50, seed=randseed) )
         opt_alg.set_verbosity(1)
-    elif(cfg.MOG_ALG == "moead"):
+    elif(cfg.mog_alg == "moead"):
         opt_alg = pyg.algorithm ( pyg.moead(gen = cfg.NO_GENERATIONS, weight_generation = "grid",
                                             decomposition = "tchebycheff", neighbours = 5,
                                             CR = 1, F = 0.5, eta_m = 20, realb = 0.9,
                                             limit = 2, preserve_diversity = True) )
-    elif(cfg.MOG_ALG == "nspso"):
+    elif(cfg.mog_alg == "nspso"):
         opt_alg = pyg.algorithm ( pyg.nspso(gen = cfg.NO_GENERATIONS, omega = 0.6, c1 = 0.01, c2 = 0.5, chi = 0.5,
                                             v_coeff = 0.5, leader_selection_range = 2,
                                             diversity_mechanism = "crowding distance",
@@ -58,30 +58,46 @@ def uniform_bitrate_init(prob, pop):
 
 
 
-def sweetspot_search():
+def sweetspot_search(codec_arg, moga_arg):
     '''
     Evolves a population with a given optimization algorithm
     '''
 
-    # Get optimization problem and algorithm
-    opt_prob = pyg.problem(sweetspot_problem())
+    # Change optimisation config if a specific argument is set
+    if codec_arg is not None: cfg.VIDEO_ENCODERS = [codec_arg]
+    if moga_arg is not None: cfg.MOG_ALGS = [moga_arg]
 
-    for i in range(1, cfg.EPOCHS+1):
-        cfg.epoch = i
-        logger.info("------------------ EPOCH " + str(i) + " -----------------")
-        
-        # Initiate population
-        pop = pyg.population(prob=opt_prob, seed=i*3+1)
-        pop = uniform_bitrate_init(opt_prob, pop)
 
-        # Set up optimization algorithm
-        opt_alg = get_optimization_algorithm(opt_prob, i*3+1)
+    # Evaluate each codec in VIDEO_ENCODERS list
+    for codec in cfg.VIDEO_ENCODERS:
+        logger.info("Optimising the " + codec + " video-codec...")
 
-        # Evolve pop using opt_alg
-        logger.debug("Starting evolution process")
-        pop = opt_alg.evolve(pop)
+        # Load parameters for codec
+        cfg.load_params_from_json(codec)
 
-        #log_stats(pop)
+        for epoch in range(1, cfg.EPOCHS+1):
+
+            for alg in cfg.MOG_ALGS:
+                cfg.epoch = epoch
+                cfg.mog_alg = alg
+                logger.info("----------- EPOCH: " + str(epoch) + " Alg: " + alg + " ------------")
+
+                # Get optimization problem and algorithm
+                opt_prob = pyg.problem(sweetspot_problem())
+
+                # Initiate population
+                rand_seed = epoch*3+1  # An arbitrary but repeatable randomisation seed
+                pop = pyg.population(prob=opt_prob, seed=rand_seed)
+                pop = uniform_bitrate_init(opt_prob, pop)
+
+                # Set up optimization algorithm
+                opt_alg = get_optimization_algorithm(opt_prob, rand_seed)
+
+                # Evolve pop using opt_alg
+                logger.debug("Starting evolution process")
+                pop = opt_alg.evolve(pop)
+
+            #log_stats(pop)
 
 
 
@@ -147,5 +163,11 @@ if(__name__ == "__main__"):
     cfg.timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     configure_logging()
 
+    parser = argparse.ArgumentParser(description='Multi objective genetic algorithm')
+    parser.add_argument('-a', '--moga', default=None, help="Evaluate using specific ML-algorithm")
+    parser.add_argument('-c', '--codec', default=None, help="Evaluate a specific codec")
+
+    args = parser.parse_args()
+
     # Start sweetspot search
-    sweetspot_search()
+    sweetspot_search(args.codec, args.moga)

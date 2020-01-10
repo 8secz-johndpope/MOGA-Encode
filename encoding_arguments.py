@@ -21,12 +21,12 @@ def get_codec_args(decision_vector, encoder):
         'pix_fmt': 'yuv420p' # ?????? TODO: Look over
     }
 
-    for i in range(1, len(cfg.OPT_PARAMS)):
+    for i in range(1, len(cfg.opt_params)):
         vector_val = int(decision_vector[i])
-        param_name = cfg.OPT_PARAMS[i]
+        param_name = cfg.opt_params[i]
         logger.debug("Adding encoding argument:  Param_name: " + param_name +
-                     " vectorval: " + cfg.OPT_VALUES[param_name][vector_val])
-        output_args[param_name] = cfg.OPT_VALUES[param_name][vector_val]
+                     " vectorval: " + cfg.opt_values[param_name][vector_val])
+        output_args[param_name] = cfg.opt_values[param_name][vector_val]
 
     # Remove tune flag if no tuning parameter is passed
     try:
@@ -40,6 +40,7 @@ def get_codec_args(decision_vector, encoder):
     elif(encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
     elif(encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
     elif(encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
+    elif(encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, decision_vector)
     elif(encoder == "libaomav1"): return get_libaomav1_args(input_args, output_args, decision_vector)
@@ -78,9 +79,9 @@ def get_h264_vaapi_args(input_args, output_args, x):
     return input_args, output_args, False
 
 
-def get_libvpxvp9_args(input_args, output_args, x):
-    # TODO: check if special arguments are to be added
-
+def get_hevc_vaapi_args(input_args, output_args, x):
+    # TODO: check if more special arguments are to be added
+    input_args = apply_vaapi_input_args(input_args)
     return input_args, output_args, False
 
 
@@ -88,6 +89,12 @@ def get_vp9_vaapi_args(input_args, output_args, x):
     # TODO: check if special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
     return input_args, output_args, False
+
+
+def get_libvpxvp9_args(input_args, output_args, x):
+    # TODO: check if special arguments are to be added
+
+    return input_args, output_args, True
 
 
 def get_libaomav1_args(input_args, output_args, x):

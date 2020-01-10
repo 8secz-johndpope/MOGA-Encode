@@ -1,0 +1,11 @@
+{
+    "bounds":{
+        "b:v": [1, 30],
+        "preset": [0, 2],
+        "tier": [0, 1]
+    },
+    "values":{
+        "preset": ["slow", "medium", "fast"],
+        "tier": ["main", "high"]
+    }
+}

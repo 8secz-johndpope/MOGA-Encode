@@ -1,0 +1,11 @@
+{
+    "bounds":{
+        "b:v": [1, 30],
+        "quality": [0, 2],
+        "pass": [0, 1]
+    },
+    "values":{
+        "quality": ["realtime", "good", "best"],
+        "pass": ["1", "2"]
+    }
+}

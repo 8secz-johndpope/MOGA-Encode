@@ -18,6 +18,8 @@ services:
         runtime: nvidia
         environment:
             - NVIDIA_VISIBLE_DEVICES=all
+        devices:
+            - "/dev/dri:/dev/dri"
         working_dir: /MOGA-Encode
         stdin_open: true
         tty: true

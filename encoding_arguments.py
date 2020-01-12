@@ -34,6 +34,7 @@ def get_codec_args(decision_vector, encoder):
     if(encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
     elif(encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
     elif(encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
+    elif(encoder == "libx265"): return get_libx264_args(input_args, output_args, decision_vector)
     elif(encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)

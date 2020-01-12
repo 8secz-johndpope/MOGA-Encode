@@ -1,0 +1,15 @@
+{
+    "bounds":{
+        "b:v": [1, 30],
+        "speed": [0, 2],
+        "profile": [0, 2],
+        "tune": [0, 3],
+        "pass": [0, 1]
+    },
+    "values":{
+        "speed": ["slow", "medium", "fast"],
+        "profile": ["main", "mainstillpicture" , "main-intra"],
+        "tune": ["none", "psnr", "ssim", "grain"],
+        "pass": ["1", "2"]
+    }
+}

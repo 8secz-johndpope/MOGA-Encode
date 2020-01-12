@@ -20,10 +20,9 @@ FITNESS_DATA_PATH = "/output/results/"
 ML_PERFORMANCE_BASELINE = 0.76146 #TODO: update when using big model
 
 # optimization_problem parameters
-ML_DATA_INPUT = "/data/untouched_big/"  #TODO: use larger dataset
+ML_DATA_INPUT = "/data/untouched_big/"
 ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
-#VIDEO_ENCODERS = ["libx264", "h264_nvenc", "hevc_nvenc", "libvpx-vp9"] # TODO: Add vaapi codecs
-VIDEO_ENCODERS = ["libvpx-vp9", "h264_nvenc", "hevc_nvenc","libx264"]
+VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265", "libvpx-vp9"] # TODO: Add vaapi codecs
 
 # ffmpeg_utils parameters
 TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount

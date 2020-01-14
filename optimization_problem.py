@@ -58,7 +58,7 @@ class sweetspot_problem:
 
         self.calls += 1 # Keep track of amount of fitness-calls
         logger.info("------------- Fitness-call " + str(self.calls) + " ---------------")
-        x_id = str(x)
+        x_id = str(np.round(x))
         logger.debug("Chromosome: " + x_id)
 
         if x_id in self.fitness_dict:

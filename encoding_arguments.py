@@ -16,13 +16,13 @@ def get_codec_args(decision_vector, encoder):
     }
     output_args = {
         "c:v": encoder,
-        'b:v':  str(int(decision_vector[0])) + "M",
+        'b:v':  str(decision_vector[0]) + "M",
         "format": 'mp4',
         'pix_fmt': 'yuv420p' # ?????? TODO: Look over
     }
 
     for i in range(1, len(cfg.opt_params)):
-        vector_val = int(decision_vector[i])
+        vector_val = int(round(decision_vector[i]))
         param_name = cfg.opt_params[i]
         logger.debug("Adding encoding argument:  Param_name: " + param_name +
                      " vectorval: " + cfg.opt_values[param_name][vector_val])

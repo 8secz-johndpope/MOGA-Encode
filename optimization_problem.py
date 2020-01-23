@@ -17,16 +17,22 @@ class sweetspot_problem:
     Contains information used to define the optimization problem.
     """
 
-    calls = 0
-    fitness_dict = {}
-    times = {}
+    calls = None
+    fitness_dict = None
+    times = None
     original_img_size = None
-    gen = 0
-    fitness_of_gen = []
+    gen = None
+    fitness_of_gen = None
 
 
     def __init__(self):
+        self.calls = 0
+        self.fitness_dict = {}
+        self.times = {}
+        self.gen = 0
+        self.fitness_of_gen = []
         self.original_img_size = ffmpeg_utils.get_directory_size(cfg.ML_DATA_INPUT)
+        logger.debug("Problem initiated")
 
 
     def get_name(self):
@@ -45,7 +51,7 @@ class sweetspot_problem:
 
     def get_nix(self):
     # Return the no integer dimensions of problem
-        return len(cfg.opt_params)
+        return len(cfg.opt_params)-1
 
 
     def fitness(self, x):
@@ -92,7 +98,7 @@ class sweetspot_problem:
             logger.debug("Applying degredation to clip: " + input_clip_dir)
             comp_size += ffmpeg_utils.transcode(input_clip_dir, output_clip_dir, x)
         transcode_time = time.time() - start_time
-        logger.info("Time for transcode: " + str(int(transcode_time))+" seconds")
+        logger.info("Time for transcode: " + str(int(round(transcode_time)))+" seconds")
 
         # Retrieve fitness results
         score = float(rest_communication.get_eval_from_ml_alg())    # Get ML-algorithm results 
@@ -112,14 +118,19 @@ class sweetspot_problem:
         Stores decision vectors and their fitness.
         Plots the fitness of all chromosomes of every generation.
         '''
+        self.fitness_of_gen.append(fitness)
+        logger.info("Entering store_results!\n Fitness_o_gen: " +
+                     str(len(self.fitness_of_gen)) + "  epoch: " + str(cfg.epoch) + 
+                     "  decision vector: " + str(x))
+
         with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/data.csv', mode='a') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.mog_alg, str(x), str(time)]
             data = np.concatenate((data, fitness), axis=None)
             data_writer.writerow(data)
-        self.fitness_of_gen.append(fitness)
 
-        if( (len(self.fitness_of_gen) == cfg.POP_SIZE)):
+
+        if( (len(self.fitness_of_gen) >= cfg.POP_SIZE)):
 
             # Name used to identify plots and files
             name = ("Epoch: " + str(cfg.epoch) + " MOGA: " + cfg.mog_alg + " Codec: " + cfg.video_encoder)

@@ -11,8 +11,8 @@ LOG_PATH = "/output/logs/"
 CLI_VERBOSITY = "INFO"  # ERROR, WARNING, INFO, DEBUG
 
 # gen-alg parameters
-POP_SIZE = 4 * 3    # must be a multiple of 4 and larger than 5!
-NO_GENERATIONS = 6
+POP_SIZE = 4 * 4    # must be a multiple of 4 and larger than 5!
+NO_GENERATIONS = 10
 MOG_ALGS = ["nspso", "nsga2"]   # nsga2, nspso, moead
 EPOCHS = 2
 PLOT_PATH = "/output/results/"

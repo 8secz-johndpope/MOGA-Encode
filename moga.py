@@ -15,7 +15,7 @@ from optimization_problem import sweetspot_problem
 logger = None
 
 
-def get_optimization_algorithm(opt_prob, randseed):
+def get_optimization_algorithm(randseed):
     '''
     Returns an optimisation algorithm
     '''
@@ -23,9 +23,8 @@ def get_optimization_algorithm(opt_prob, randseed):
     if(cfg.mog_alg == "nsga2"):
         # cr: crossover probability, m: mutation probability
         # eta_c: distribution index for crossover, eta_m: distribution index for mutation
-        opt_alg = pyg.algorithm( pyg.nsga2(gen=cfg.NO_GENERATIONS, cr=0.85, m=0.15,
+        opt_alg = pyg.algorithm( pyg.nsga2(gen=cfg.NO_GENERATIONS, cr=0.925, m=0.1,
                                            eta_c=10, eta_m=50, seed=randseed) )
-        opt_alg.set_verbosity(1)
     elif(cfg.mog_alg == "moead"):
         opt_alg = pyg.algorithm ( pyg.moead(gen = cfg.NO_GENERATIONS, weight_generation = "grid",
                                             decomposition = "tchebycheff", neighbours = 5,
@@ -36,6 +35,7 @@ def get_optimization_algorithm(opt_prob, randseed):
                                             v_coeff = 0.5, leader_selection_range = 2,
                                             diversity_mechanism = "crowding distance",
                                             memory = False) )
+    opt_alg.set_verbosity(1)
     return opt_alg
 
 
@@ -51,7 +51,10 @@ def uniform_bitrate_init(prob, pop):
         bitrate = round(low_bounds[0] + stepsize*i, 3)
         x = [bitrate]
         for j in range(1, len(low_bounds)):
-            x.append(random.randint(low_bounds[j], high_bounds[j]))
+            if cfg.opt_type[j] == "f":
+                x.append(random.uniform(low_bounds[j], high_bounds[j]))
+            else:
+                x.append(random.randint(low_bounds[j], high_bounds[j]))
         logger.debug("Pushing chromosome: " + str(x))
         pop.push_back(x)
     return pop
@@ -91,7 +94,7 @@ def sweetspot_search(codec_arg, moga_arg):
                 pop = uniform_bitrate_init(opt_prob, pop)
 
                 # Set up optimization algorithm
-                opt_alg = get_optimization_algorithm(opt_prob, rand_seed)
+                opt_alg = get_optimization_algorithm(rand_seed)
 
                 # Evolve pop using opt_alg
                 logger.debug("Starting evolution process")

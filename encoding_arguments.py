@@ -22,11 +22,19 @@ def get_codec_args(decision_vector, encoder):
     }
 
     for i in range(1, len(cfg.opt_params)):
-        vector_val = int(round(decision_vector[i]))
+        arg_val = None
         param_name = cfg.opt_params[i]
+        if cfg.opt_type[i] == "c":
+            vector_val = int(round(decision_vector[i]))
+            arg_val = cfg.opt_cat_values[param_name][vector_val]
+        elif cfg.opt_type[i] == "i":
+            arg_val = int(round(decision_vector[i]))
+        else:
+            arg_val = decision_vector[i]
         logger.debug("Adding encoding argument:  Param_name: " + param_name +
-                     " vectorval: " + cfg.opt_values[param_name][vector_val])
-        output_args[param_name] = cfg.opt_values[param_name][vector_val]
+        " arg_val: " + str(arg_val))
+        output_args[param_name] = arg_val
+
 
 
 

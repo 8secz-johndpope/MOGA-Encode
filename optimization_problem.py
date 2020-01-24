@@ -51,7 +51,7 @@ class sweetspot_problem:
 
     def get_nix(self):
     # Return the no integer dimensions of problem
-        return len(cfg.opt_params)-1
+        return len(cfg.opt_params)-cfg.no_continous
 
 
     def fitness(self, x):

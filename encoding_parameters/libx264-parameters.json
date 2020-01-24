@@ -1,15 +1,41 @@
 {
     "bounds":{
-        "b:v": [1, 30],
-        "speed": [0, 2],
-        "profile": [0, 2],
-        "tune": [0, 3],
-        "pass": [0, 1]
+        "b:v": [1, 30, "f"],
+        "aq-strength": [0.1, 1.9, "f"],
+        "pass": [0, 1, "c"],
+        "tune": [0, 3, "c"],
+        "intra-refresh": [0, 1, "c"],
+        "b_strategy": [0, 2, "c"],
+        "trellis": [0, 1 , "c"], 
+        "me_method": [0, 4, "c"],
+        "coder": [0, 1, "c"],
+        "cmp": [0, 1, "c"],
+        "aq-mode":  [0, 2, "c"],
+        "psy": [0, 1, "c"],
+        "weightp":  [0, 2, "c"],
+        "weightb": [0, 1, "c"],
+        "sc_threshold": [0, 100, "i"],
+        "bf": [1, 10, "i"],
+        "qmin": [6, 19, "i"],
+        "qmax": [20, 60, "i"],
+        "qdiff": [1, 10, "i"],
+        "me_range": [4, 16, "i"],
+        "subq": [2, 9, "i"]
     },
-    "values":{
-        "speed": ["slow", "medium", "fast"],
-        "profile": ["baseline","main", "high"],
+    "categorical":{
         "tune": ["none", "stillimage", "film", "grain"],
-        "pass": ["1", "2"]
+        "pass": ["1", "2"],
+        "intra-refresh": ["1", "0"],
+        "b_strategy": ["0", "1", "2"],
+        "trellis": ["1" , "0"], 
+        "me_method": ["dia", "hex", "umh", "esa", "tesa"],
+        "coder": ["ac", "vlc"],
+        "cmp": ["chroma", "sad"],
+        "aq-mode": ["none", "variance", "autovariance"],
+        "psy": ["0", "1"],
+        "weightp": ["none", "simple", "smart"],
+        "weightb": ["0", "1"]
     }
 }
+
+

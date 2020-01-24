@@ -56,6 +56,8 @@ def get_libx264_args(input_args, output_args, x):
     output_args["maxrate"] = str(x[0])+"M"
     output_args["minrate"] = str(x[0])+"M"
 
+    if(output_args["coder"] == "vlc"): del output_args["trellis"]
+
     # Remove tune flag if no tuning parameter is passed
     try:
         if(output_args["tune"] == "none"): del output_args["tune"]

@@ -14,10 +14,10 @@ CLI_VERBOSITY = "INFO"  # ERROR, WARNING, INFO, DEBUG
 POP_SIZE = 4 * 4    # must be a multiple of 4 and larger than 5!
 NO_GENERATIONS = 10
 MOG_ALGS = ["nsga2"]   # nsga2, nspso, moead
-EPOCHS = 2
+EPOCHS = 1
 PLOT_PATH = "/output/results/"
 FITNESS_DATA_PATH = "/output/results/"
-ML_PERFORMANCE_BASELINE = 0.76146 #TODO: update when using big model
+ML_PERFORMANCE_BASELINE = 0.793947687576
 
 # optimization_problem parameters
 ML_DATA_INPUT = "/data/untouched_big/"

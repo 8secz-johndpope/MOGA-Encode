@@ -10,6 +10,7 @@
         "cmp": [0, 1, "c"],
         "aq-mode":  [0, 2, "c"],
         "weightp":  [0, 2, "c"],
+        "b-pyramid": [0, 2, "c"],
         "weightb": [0, 1, "i"],
         "b_strategy": [0, 2, "i"],
         "g": [50, 1000, "i"],
@@ -19,11 +20,16 @@
         "trellis": [0, 1 , "i"],
         "sc_threshold": [0, 100, "i"],
         "bf": [1, 16, "i"],
+        "refs": [1, 16, "i"],
         "qmin": [5, 14, "i"],
         "qmax": [15, 51, "i"],
         "qdiff": [1, 8, "i"],
         "me_range": [4, 16, "i"],
-        "subq": [2, 9, "i"]
+        "subq": [2, 9, "i"],
+        "rc-lookahead": [20, 60, "i"],
+        "b-bias": [-100, 100, "i"],
+        "mixed-refs": [0, 1, "i"],
+        "8x8dct": [0, 1, "i"]
     },
     "categorical":{
         "tune": ["none", "stillimage", "film", "grain"],
@@ -33,7 +39,8 @@
         "coder": ["ac", "vlc"],
         "cmp": ["chroma", "sad"],
         "aq-mode": ["none", "variance", "autovariance"],
-        "weightp": ["none", "simple", "smart"]
+        "weightp": ["none", "simple", "smart"],
+        "b-pyramid": ["none", "strict", "normal"]
     }
 }
 

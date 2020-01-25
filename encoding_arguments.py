@@ -42,7 +42,7 @@ def get_codec_args(decision_vector, encoder):
     if(encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
     elif(encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
     elif(encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
-    elif(encoder == "libx265"): return get_libx264_args(input_args, output_args, decision_vector)
+    elif(encoder == "libx265"): return get_libx265_args(input_args, output_args, decision_vector)
     elif(encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
@@ -54,7 +54,33 @@ def get_codec_args(decision_vector, encoder):
 
 def get_libx264_args(input_args, output_args, x):
     output_args["maxrate"] = str(x[0])+"M"
-    output_args["minrate"] = str(x[0])+"M"
+
+    try:
+        output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
+        del output_args["bufratio"]
+    except Exception:
+        logger.critical("Could not set buffer size, quitting...")
+        exit(1)
+
+    if(output_args["coder"] == "vlc"): del output_args["trellis"]
+
+    # Remove tune flag if no tuning parameter is passed
+    try:
+        if(output_args["tune"] == "none"): del output_args["tune"]
+    except Exception:
+        logger.debug("No tune parameter found, continuing...")
+
+    # Checks if one or two passes are to be done
+    is_two_pass = True if output_args["pass"]=="2" else False
+    del output_args["pass"]
+
+    return input_args, output_args, is_two_pass
+
+
+
+def get_libx265_args(input_args, output_args, x):
+
+    # TODO: fix conditions
 
     if(output_args["coder"] == "vlc"): del output_args["trellis"]
 

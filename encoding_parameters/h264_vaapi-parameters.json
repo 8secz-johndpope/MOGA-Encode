@@ -1,6 +1,6 @@
 {
     "bounds":{
-        "b:v": [1, 50, "f"],
+        "b:v": [0.5, 50, "f"],
         "rc_mode": [0,2, "c"],
         "coder": [0, 1, "c"],
         "compression_level": [1 , 5, "i"],

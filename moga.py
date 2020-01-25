@@ -48,7 +48,7 @@ def uniform_bitrate_init(prob, pop):
     low_bounds, high_bounds = prob.get_bounds()
     stepsize = (high_bounds[0]-low_bounds[0]) / cfg.POP_SIZE
     for i in range(0, cfg.POP_SIZE):
-        bitrate = round(low_bounds[0] + stepsize*i, 3)
+        bitrate = round(low_bounds[0] + stepsize*i, 7)
         x = [bitrate]
         for j in range(1, len(low_bounds)):
             if cfg.opt_type[j] == "f":

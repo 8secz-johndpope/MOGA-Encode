@@ -1,0 +1,17 @@
+{
+    "bounds":{
+        "b:v": [1, 50, "f"],
+        "rc_mode": [0,2, "c"],
+        "compression_level": [1 , 5, "i"],
+        "g": [50, 1000, "i"],
+        "sc_threshold": [0, 60, "i"],
+        "bf": [1, 16, "i"],
+        "refs": [1, 16, "i"],
+        "qmin": [0, 14, "i"],
+        "qmax": [15, 69, "i"],
+        "b_depth": [1, 5, "i"]
+    },
+    "categorical":{
+        "rc_mode": ["CBR", "VBR", "AVBR"]
+    }
+}

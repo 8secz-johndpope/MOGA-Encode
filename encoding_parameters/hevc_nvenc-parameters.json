@@ -1,11 +1,24 @@
 {
     "bounds":{
-        "b:v": [1, 30],
-        "preset": [0, 2],
-        "tier": [0, 1]
+        "b:v": [1, 50, "f"],
+        "preset": [0, 6, "c"],
+        "rc": [0, 3, "c"],
+        "aq-strength": [1, 15, "i"],
+        "rc-lookahead": [0, 60, "i"],
+        "surfaces": [0, 64, "i"],
+        "2pass": [0, 1, "i"],
+        "spatial_aq": [0, 1, "i"],
+        "temporal_aq": [0, 1, "i"],
+        "nonref_p": [0, 1, "i"],
+        "weighted_pred": [0, 1, "i"],
+        "strict_gop": [0, 1, "i"],
+        "b_ref_mode": [0, 2, "i"],
+
     },
-    "values":{
-        "preset": ["slow", "medium", "fast"],
-        "tier": ["main", "high"]
+    "categorical":{
+        "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],
+        "rc": ["cbr", "vbr", "cbr_hq", "vbr_hq"]
     }
 }
+
+

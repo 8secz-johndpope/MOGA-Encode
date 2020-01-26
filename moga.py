@@ -3,7 +3,7 @@
 # Imports
 import pygmo as pyg
 import numpy as np
-import random, logging, os, argparse
+import random, logging, os, argparse, csv
 from datetime import datetime
 
 # Import modules
@@ -104,27 +104,68 @@ def sweetspot_search(codec_arg, moga_arg):
 
 
 
-
-def log_stats(pop):
+def get_csv_data(recon_info):
     '''
-    Logs statistics of a population
-    TODO: Clean up funciton and 
+    Reconstructs a population from a CSV file
     '''
-    fits, vectors = pop.get_f(), pop.get_x()
-    mean_cd = []
+    logger.debug("Repopulating...")
+    # recon_info <- [csv-file, start-index, end-index]
 
-    ndf, dl, dc, ndr  = pyg.fast_non_dominated_sorting(fits)
+    with open( recon_info[0], mode='r') as csv_file:
+        data = csv.reader(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        pop_data = []
+        fitness_dict = {}
+        for row in data:
+            index = int(row[0])
+            fit = [float(row[6]), float(row[7])]
+            d_vector = row[4]
+            d_vector = d_vector.strip('\n').strip('[').strip(']')
+            x_id = d_vector
+            d_vector = d_vector.split(',')
+            d_vector = np.array(d_vector, dtype="float32")
+            fitness_dict[x_id] = fit
+            if(recon_info[1] <= index <= recon_info[2]):
+                pop_data.append([d_vector, fit])
 
-    logger.info("Non-dominated front")
-    for nd in ndf:
-        logger.info("Vector: " + str(vectors[nd]) +"\Fitness: " + str(fits[nd]))
-    logger.debug("DL: " + str(dl) + "\nDC: " + str(dc) +"\nNDR: " + str(ndr))
+        return fitness_dict, pop_data
 
-    cr_dist = pyg.crowding_distance(pop.get_f()[ndf])
+    logger.critical("Error loading data csv")
+    exit(1)
 
-    logger.info("Means of fitness-vectors: " + str(np.mean(pop.get_f(), axis=0)))
-    mean_cd.append(np.mean(cr_dist[np.isfinite(cr_dist)]))
-    logger.info("Crowding distance mean and std: %(mean)f +/- %(std)f" %{"mean":np.nanmean(mean_cd), "std":np.nanstd(mean_cd)}) 
+
+def repopulate_pop(pop, pop_data):
+    for d_vector_data in pop_data:
+        x = d_vector_data[0]
+        fit = d_vector_data[1]
+        pop.push_back(x, fit)
+        logger.debug("Pushing chromosome: " + str(x)+ "\nwith fitness: " + str(fit))
+    return pop
+
+def resume_optimisation(codec_arg, moga_arg, recon_info):
+
+    # Load parameters for codec
+    cfg.load_params_from_json(codec_arg)
+
+    cfg.epoch = 1  # Arbitrary epoch nr
+    cfg.mog_alg = moga_arg
+    cfg.NO_GENERATIONS = recon_info[3]
+    rand_seed = 1
+
+    # Get optimization problem and algorithm
+    fitness_dict, pop_data = get_csv_data(recon_info)
+    ssp = sweetspot_problem()
+    ssp.fitness_dict = fitness_dict
+    opt_prob = pyg.problem(ssp)
+    pop = pyg.population(prob=opt_prob)
+    pop = repopulate_pop(pop, pop_data)
+    logger.info("Loaded population:\n")
+    logger.info(pop)
+    # Set up optimization algorithm
+    opt_alg = get_optimization_algorithm(rand_seed)
+
+    # Evolve pop using opt_alg
+    logger.debug("Starting evolution process")
+    pop = opt_alg.evolve(pop)
 
 
 def configure_logging():
@@ -169,8 +210,23 @@ if(__name__ == "__main__"):
     parser = argparse.ArgumentParser(description='Multi objective genetic algorithm')
     parser.add_argument('-a', '--moga', default=None, help="Evaluate using specific ML-algorithm")
     parser.add_argument('-c', '--codec', default=None, help="Evaluate a specific codec")
+    parser.add_argument('-r', '--resume', default=None, help="Resume optimisation using CSV-file")
+    parser.add_argument('-rs', '--rstart', type=int, default=None, help="Start index of generation to resume")
+    parser.add_argument('-re', '--rend', type=int, default=None, help="End index of generation to resume")
+    parser.add_argument('-rg', '--rgen', type=int, default=None, help="Number of generations left to evovle")
+
 
     args = parser.parse_args()
 
-    # Start sweetspot search
-    sweetspot_search(args.codec, args.moga)
+    if(args.resume == None):
+        # Start sweetspot search
+        sweetspot_search(args.codec, args.moga)
+    else:
+        if(args.rstart == None and
+           args.rend == None and
+           args.rgen == None and
+           args.moga == None and
+           args.codec == None):
+            logger.error("Resumption of optimisation requires -rs and -re to be set with the start and end index for generation to resume")
+            exit(1)
+        resume_optimisation(args.codec, args.moga, [args.resume, args.rstart, args.rend, args.rgen])

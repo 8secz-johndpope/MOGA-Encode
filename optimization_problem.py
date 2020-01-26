@@ -125,7 +125,7 @@ class sweetspot_problem:
 
         with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/data.csv', mode='a') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.mog_alg, str(x), str(time)]
+            data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.mog_alg, np.array2string(x, precision = 6, separator=','), str(time)]
             data = np.concatenate((data, fitness), axis=None)
             data_writer.writerow(data)
 

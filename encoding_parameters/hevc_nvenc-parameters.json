@@ -1,7 +1,7 @@
 {
     "bounds":{
-        "b:v": [0.5, 50, "f"],
-        "preset": [0, 6, "c"],
+        "b:v": [1, 50, "f"],
+        "preset": [0, 5, "c"],
         "rc": [0, 3, "c"],
         "aq-strength": [1, 15, "i"],
         "rc-lookahead": [0, 60, "i"],
@@ -12,8 +12,7 @@
         "nonref_p": [0, 1, "i"],
         "weighted_pred": [0, 1, "i"],
         "strict_gop": [0, 1, "i"],
-        "b_ref_mode": [0, 2, "i"],
-
+        "b_ref_mode": [0, 2, "i"]
     },
     "categorical":{
         "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],

@@ -64,7 +64,7 @@ class sweetspot_problem:
 
         self.calls += 1 # Keep track of amount of fitness-calls
         logger.info("------------- Fitness-call " + str(self.calls) + " ---------------")
-        x_id = str(np.round(x))
+        x_id = str(np.round(x, 5))
         logger.debug("Chromosome: " + x_id)
 
         if x_id in self.fitness_dict:
@@ -147,7 +147,7 @@ class sweetspot_problem:
                 pl.plot_front(name +" all fits", fitness_values, ndf)
                 
                 # Save ndf results to file
-                with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/ndf-epoch'+str(cfg.epoch)+'.csv', mode='w') as data_file:
+                with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/ndf-epoch'+str(cfg.epoch)+"-codec"+ cfg.video_encoder +'.csv', mode='w') as data_file:
                     data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     for i in ndf:
                         data = np.concatenate((fitness_keys[i], fitness_values[i]), axis=None)

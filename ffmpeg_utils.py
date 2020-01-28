@@ -20,6 +20,7 @@ def img_to_vid(images_dir, decision_vector, encoder):
     out_path = cfg.TEMP_STORAGE_PATH
 
     if(is_two_pass):
+        if cfg.video_encoder == "libaom-av1" : output_args["cpu-used"] = "8"
         try:
             logger.debug("Applying two passes!")
             output_args["pass"] = "1"
@@ -37,6 +38,7 @@ def img_to_vid(images_dir, decision_vector, encoder):
             exit(1)
 
     try:
+        if cfg.video_encoder == "libaom-av1" : output_args["cpu-used"] = "0"
         (
             ffmpeg
             .input(filenaming, **input_args)

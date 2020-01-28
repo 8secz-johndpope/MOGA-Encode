@@ -47,7 +47,7 @@ def get_codec_args(decision_vector, encoder):
     elif(encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, decision_vector)
-    elif(encoder == "libaomav1"): return get_libaomav1_args(input_args, output_args, decision_vector)
+    elif(encoder == "libaom-av1"): return get_libaomav1_args(input_args, output_args, decision_vector)
     else: raise Exception("Could not find codec")
 
 
@@ -146,6 +146,8 @@ def get_libaomav1_args(input_args, output_args, x):
     # TODO: check if special arguments are to be added
     output_args["row-mt"] = "1"
     output_args["tiles"] = "2x2"
+    output_args["threads"] = "16"
+    output_args["strict"] = "experimental"
     return input_args, output_args, False
 
 def apply_vaapi_input_args(input_args):

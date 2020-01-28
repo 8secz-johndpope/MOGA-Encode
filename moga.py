@@ -39,24 +39,34 @@ def get_optimization_algorithm(randseed):
     return opt_alg
 
 
-def uniform_bitrate_init(prob, pop):
+def uniform_init(prob, pop):
     '''
-    Initialize chromosomes of pop with uniform initialization of bitrate gene
-    and random initialization for the other genes
+    Initialize chromosomes of pop with uniform initialization of all genes
     '''
     logger.debug("Populating population...")
     low_bounds, high_bounds = prob.get_bounds()
-    stepsize = (high_bounds[0]-low_bounds[0]) / cfg.POP_SIZE
-    for i in range(0, cfg.POP_SIZE):
-        bitrate = round(low_bounds[0] + stepsize*i, 7)
-        x = [bitrate]
-        for j in range(1, len(low_bounds)):
-            if cfg.opt_type[j] == "f":
-                x.append(random.uniform(low_bounds[j], high_bounds[j]))
-            else:
-                x.append(random.randint(low_bounds[j], high_bounds[j]))
-        logger.debug("Pushing chromosome: " + str(x))
-        pop.push_back(x)
+
+    # Create uniform decision vectors
+    decision_vectors = []
+    for param in range(0, len(low_bounds)):
+        stepsize = (high_bounds[param]-low_bounds[param]) / cfg.POP_SIZE
+        param_vals = []
+        for i in range(0, cfg.POP_SIZE):
+            param_vals.append(low_bounds[param] + stepsize*i)
+        random.shuffle(param_vals)
+
+        # Round param values if paramtype isnt float
+        if cfg.opt_type[param] != "f":
+            param_vals = np.around(param_vals, decimals=0)
+        decision_vectors.append(param_vals)
+
+    decision_vectors = np.transpose(decision_vectors)
+    logger.debug("Initial decision vectors:\n" + str(decision_vectors))
+
+    # Add decision vectors to population
+    for d_vector in decision_vectors:
+        logger.debug("Pushing chromosome: " + str(d_vector))
+        pop.push_back(d_vector)
     return pop
 
 
@@ -90,8 +100,9 @@ def sweetspot_search(codec_arg, moga_arg):
 
                 # Initiate population
                 rand_seed = epoch*3+1  # An arbitrary but repeatable randomisation seed
+                # random.seed(rand_seed)
                 pop = pyg.population(prob=opt_prob, seed=rand_seed)
-                pop = uniform_bitrate_init(opt_prob, pop)
+                pop = uniform_init(opt_prob, pop)
 
                 # Set up optimization algorithm
                 opt_alg = get_optimization_algorithm(rand_seed)

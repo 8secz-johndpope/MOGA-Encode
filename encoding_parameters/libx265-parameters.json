@@ -29,7 +29,7 @@
         "me_range": [57, 100, "i"],
         "subq": [2, 9, "i"],
         "rc-lookahead": [20, 60, "i"],
-        "b-bias": [-90, 100, "i"],
+        "b-bias": [-90, 100, "i"]
     },
     "categorical":{
         "tune": ["none", "psnr", "ssim", "grain"],

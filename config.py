@@ -25,8 +25,10 @@ ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
 VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265", "libvpx-vp9"] # TODO: Add vaapi codecs
 RATE_CONTROL = {"h264_nvenc": "CBR",
                 "hevc_nvenc": "CBR",
-                "libx264": "CBR",
+                "libx264": "CRF",
                 "libx265": "CBR",
+                "h264_vaapi": "CBR",
+                "hevc_vaapi": "CBR",
                 "libvpx-vp9": "CBR"}
 
 # ffmpeg_utils parameters
@@ -74,10 +76,14 @@ def load_params_from_json(video_codec):
     json_params = None
     with open(JSON_PARAM_PATH, 'r') as f:
         json_params = json.load(f)
-        
-    json_params = json_params[video_codec]
-    param_bounds = json_params["bounds"]
-    opt_cat_values = json_params["categorical"]
+
+    try:
+        json_params = json_params[RATE_CONTROL[video_codec]]
+        param_bounds = json_params["bounds"]
+        opt_cat_values = json_params["categorical"]
+    except Exception as e:
+        logger.critical("Faulty JSON file or configuration, KeyError:" + str(e))
+        exit(1)
 
     for param in param_bounds:
         opt_params.append(param)

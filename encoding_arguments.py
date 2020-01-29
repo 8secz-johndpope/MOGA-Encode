@@ -16,8 +16,7 @@ def get_codec_args(decision_vector, encoder):
     }
     output_args = {
         "c:v": encoder,
-        "format": 'mp4',
-        'pix_fmt': 'yuv420p' # ?????? TODO: Look over
+        "format": 'mp4
     }
 
     for i in range(0, len(cfg.opt_params)):
@@ -35,7 +34,7 @@ def get_codec_args(decision_vector, encoder):
         output_args[param_name] = arg_val
 
 
-    if 'b:v' in output_args: output_args['b:v'] += "M"
+    if 'b:v' in output_args: output_args['b:v'] = str(output_args['b:v'])+"M"
 
 
 
@@ -55,6 +54,7 @@ def get_codec_args(decision_vector, encoder):
 
 def get_libx264_args(input_args, output_args, x):
     
+    output_args["pix_fmt"] = "rgb"
     is_two_pass = False
 
     # Constant bitrate with constrained encoding
@@ -87,6 +87,7 @@ def get_libx264_args(input_args, output_args, x):
 def get_libx265_args(input_args, output_args, x):
 
     # TODO: fix conditions
+    output_args["pix_fmt"] = "yuvj444p"
 
     if(output_args["coder"] == "vlc"): del output_args["trellis"]
 
@@ -104,13 +105,13 @@ def get_libx265_args(input_args, output_args, x):
 
 
 def get_h264_nvenc_args(input_args, output_args, x):
-    # TODO: check if special arguments are to be added
-
+    output_args["pix_fmt"] = "rgb0"
+    input_args["hwaccel"] = "nvdec"
     return input_args, output_args, False
 
 
 def get_hevc_nvenc_args(input_args, output_args, x):
-    # TODO: check if special arguments are to be added
+    output_args["pix_fmt"] = "rgb0"
     input_args["hwaccel"] = "nvdec"
     output_args["b_ref_mode:v"]= "middle"
 
@@ -120,6 +121,9 @@ def get_hevc_nvenc_args(input_args, output_args, x):
 def get_h264_vaapi_args(input_args, output_args, x):
     # TODO: check if more special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
+    output_args["filter_hw_device"] = "foo"
+    del output_args["pix_fmt"]
+    output_args["vf"] = "format=yuv420p|vaapi,hwupload"
     return input_args, output_args, False
 
 
@@ -156,8 +160,10 @@ def get_libaomav1_args(input_args, output_args, x):
     output_args["strict"] = "experimental"
     return input_args, output_args, False
 
+
 def apply_vaapi_input_args(input_args):
     input_args["hwaccel"] = "vaapi"
     input_args["hwaccel_output_format"] = "vaapi"
-    input_args["hwaccel_device"] = "/dev/dri/renderD128"
+    input_args["init_hw_device"] = "vaapi=foo:/dev/dri/renderD128"
+    input_args["hwaccel_device"] = "foo"
     return input_args

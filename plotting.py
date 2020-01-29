@@ -26,7 +26,7 @@ def plot_front(title, fitness, ndf=[]):
     ax.axhline(y = cfg.ML_PERFORMANCE_BASELINE, color="black",  linestyle="dotted")  # Add baseline
    
     # Plot styling
-    plot_name = "Fronteer of " + title
+    plot_name = "Frontier of " + title
     ax.set_title(plot_name)
     ax.set_ylabel("ML-performance")
     ax.set_xlabel("Compression ratio")

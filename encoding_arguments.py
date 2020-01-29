@@ -16,12 +16,11 @@ def get_codec_args(decision_vector, encoder):
     }
     output_args = {
         "c:v": encoder,
-        'b:v':  str(decision_vector[0]) + "M",
         "format": 'mp4',
         'pix_fmt': 'yuv420p' # ?????? TODO: Look over
     }
 
-    for i in range(1, len(cfg.opt_params)):
+    for i in range(0, len(cfg.opt_params)):
         arg_val = None
         param_name = cfg.opt_params[i]
         if cfg.opt_type[i] == "c":
@@ -35,6 +34,8 @@ def get_codec_args(decision_vector, encoder):
         " arg_val: " + str(arg_val))
         output_args[param_name] = arg_val
 
+
+    if 'b:v' in output_args: output_args['b:v'] += "M"
 
 
 
@@ -53,14 +54,23 @@ def get_codec_args(decision_vector, encoder):
 
 
 def get_libx264_args(input_args, output_args, x):
-    output_args["maxrate"] = str(x[0])+"M"
+    
+    is_two_pass = False
 
-    try:
-        output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
-        del output_args["bufratio"]
-    except Exception:
-        logger.critical("Could not set buffer size, quitting...")
-        exit(1)
+    # Constant bitrate with constrained encoding
+    if 'b:v' in output_args: 
+        output_args["maxrate"] = output_args['b:v']
+
+        try:
+            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
+            del output_args["bufratio"]
+        except Exception:
+            logger.critical("Could not set buffer size, quitting...")
+            exit(1)
+
+        # Checks if one or two passes are to be done
+        if output_args["pass"]=="2": is_two_pass = True
+        del output_args["pass"]
 
     if(output_args["coder"] == "vlc"): del output_args["trellis"]
 
@@ -69,10 +79,6 @@ def get_libx264_args(input_args, output_args, x):
         if(output_args["tune"] == "none"): del output_args["tune"]
     except Exception:
         logger.debug("No tune parameter found, continuing...")
-
-    # Checks if one or two passes are to be done
-    is_two_pass = True if output_args["pass"]=="2" else False
-    del output_args["pass"]
 
     return input_args, output_args, is_two_pass
 

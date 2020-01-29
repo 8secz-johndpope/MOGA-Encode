@@ -23,6 +23,11 @@ ML_PERFORMANCE_BASELINE = 0.793947687576
 ML_DATA_INPUT = "/data/untouched_big/"
 ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
 VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265", "libvpx-vp9"] # TODO: Add vaapi codecs
+RATE_CONTROL = {"h264_nvenc": "CBR",
+                "hevc_nvenc": "CBR",
+                "libx264": "CBR",
+                "libx265": "CBR",
+                "libvpx-vp9": "CBR"}
 
 # ffmpeg_utils parameters
 TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
@@ -69,7 +74,8 @@ def load_params_from_json(video_codec):
     json_params = None
     with open(JSON_PARAM_PATH, 'r') as f:
         json_params = json.load(f)
-    
+        
+    json_params = json_params[video_codec]
     param_bounds = json_params["bounds"]
     opt_cat_values = json_params["categorical"]
 

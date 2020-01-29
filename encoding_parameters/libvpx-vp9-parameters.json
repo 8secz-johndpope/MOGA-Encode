@@ -1,11 +1,13 @@
 {
-    "bounds":{
-        "b:v": [1, 30],
-        "deadline": [0, 2],
-        "pass": [0, 1]
-    },
-    "values":{
-        "deadline": ["realtime", "good", "best"],
-        "pass": ["1", "2"]
+    "CBR":{
+        "bounds":{
+            "b:v": [1, 30],
+            "deadline": [0, 2],
+            "pass": [0, 1]
+        },
+        "values":{
+            "deadline": ["realtime", "good", "best"],
+            "pass": ["1", "2"]
+        }
     }
 }

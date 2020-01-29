@@ -1,21 +1,71 @@
 {
-    "bounds":{
-        "b:v": [1, 50, "f"],
-        "preset": [0, 5, "c"],
-        "rc": [0, 3, "c"],
-        "aq-strength": [1, 15, "i"],
-        "rc-lookahead": [0, 60, "i"],
-        "surfaces": [0, 64, "i"],
-        "2pass": [0, 1, "i"],
-        "spatial_aq": [0, 1, "i"],
-        "temporal_aq": [0, 1, "i"],
-        "nonref_p": [0, 1, "i"],
-        "weighted_pred": [0, 1, "i"],
-        "strict_gop": [0, 1, "i"]
+    "CBR":{
+        "bounds":{
+            "b:v": [1, 50, "f"],
+            "preset": [0, 5, "c"],
+            "rc": [0, 3, "c"],
+            "aq-strength": [1, 15, "i"],
+            "rc-lookahead": [0, 60, "i"],
+            "surfaces": [0, 64, "i"],
+            "2pass": [0, 1, "i"],
+            "spatial_aq": [0, 1, "i"],
+            "temporal_aq": [0, 1, "i"],
+            "nonref_p": [0, 1, "i"],
+            "weighted_pred": [0, 1, "i"],
+            "strict_gop": [0, 1, "i"]
+        },
+        "categorical":{
+            "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],
+            "rc": ["cbr", "vbr", "cbr_hq", "vbr_hq"]
+        }
     },
-    "categorical":{
-        "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],
-        "rc": ["cbr", "vbr", "cbr_hq", "vbr_hq"]
+    "CQP":{
+        "bounds":{
+            "qp": [1, 40, "i"],
+            "preset": [0, 5, "c"],
+            "rc": [0, 0, "c"],
+            "aq-strength": [1, 15, "i"],
+            "rc-lookahead": [0, 60, "i"],
+            "surfaces": [0, 64, "i"],
+            "2pass": [0, 1, "i"],
+            "spatial_aq": [0, 1, "i"],
+            "temporal_aq": [0, 1, "i"],
+            "nonref_p": [0, 1, "i"],
+            "weighted_pred": [0, 1, "i"],
+            "strict_gop": [0, 1, "i"]
+        },
+        "categorical":{
+            "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],
+            "rc": ["constqp"]
+        }
+    },
+    "VBR-CQ":{
+        "bounds":{
+            "cq": [1, 40, "i"],
+            "preset": [0, 5, "c"],
+            "rc": [0, 0, "c"],
+            "aq-strength": [1, 15, "i"],
+            "rc-lookahead": [0, 60, "i"],
+            "surfaces": [0, 64, "i"],
+            "2pass": [0, 1, "i"],
+            "spatial_aq": [0, 1, "i"],
+            "temporal_aq": [0, 1, "i"],
+            "nonref_p": [0, 1, "i"],
+            "weighted_pred": [0, 1, "i"],
+            "strict_gop": [0, 1, "i"]
+        },
+        "categorical":{
+            "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],
+            "rc": ["vbr", "vbr_hq"]
+        }
+    },
+    "LL":{
+        "bounds":{
+            "preset": [0, 1, "i"]
+        },
+        "categorical":{
+            "preset": ["lossless", "losslesshp"]
+        }
     }
 }
 

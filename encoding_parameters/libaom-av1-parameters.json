@@ -1,8 +1,9 @@
 {
-    "bounds":{
-        "b:v": [2, 50, "f"]
-    },
-    "categorical":{
+    "CBR":{
+        "bounds":{
+            "b:v": [2, 50, "f"]
+        },
+        "categorical":{}
     }
 }
 

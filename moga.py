@@ -23,7 +23,7 @@ def get_optimization_algorithm(randseed):
     if(cfg.mog_alg == "nsga2"):
         # cr: crossover probability, m: mutation probability
         # eta_c: distribution index for crossover, eta_m: distribution index for mutation
-        opt_alg = pyg.algorithm( pyg.nsga2(gen=cfg.NO_GENERATIONS, cr=0.925, m=0.1,
+        opt_alg = pyg.algorithm( pyg.nsga2(gen=cfg.NO_GENERATIONS, cr=0.925, m=0.05,
                                            eta_c=10, eta_m=50, seed=randseed) )
     elif(cfg.mog_alg == "moead"):
         opt_alg = pyg.algorithm ( pyg.moead(gen = cfg.NO_GENERATIONS, weight_generation = "grid",

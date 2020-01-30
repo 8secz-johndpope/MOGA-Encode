@@ -16,7 +16,7 @@ def get_codec_args(decision_vector, encoder):
     }
     output_args = {
         "c:v": encoder,
-        "format": 'mp4
+        "format": 'mp4'
     }
 
     for i in range(0, len(cfg.opt_params)):
@@ -73,6 +73,7 @@ def get_libx264_args(input_args, output_args, x):
         del output_args["pass"]
 
     if(output_args["coder"] == "vlc"): del output_args["trellis"]
+    if(output_args["subq"] == 10 and (output_args["aq-mode"]==0 or output_args["trellis"]!= 2)): del output_args["subq"]
 
     # Remove tune flag if no tuning parameter is passed
     try:
@@ -122,20 +123,23 @@ def get_h264_vaapi_args(input_args, output_args, x):
     # TODO: check if more special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
-    del output_args["pix_fmt"]
-    output_args["vf"] = "format=yuv420p|vaapi,hwupload"
+    output_args["vf"] = "format=nv12|vaapi,hwupload"
     return input_args, output_args, False
 
 
 def get_hevc_vaapi_args(input_args, output_args, x):
     # TODO: check if more special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
+    output_args["filter_hw_device"] = "foo"
+    output_args["vf"] = "format=nv12|vaapi,hwupload"
     return input_args, output_args, False
 
 
 def get_vp9_vaapi_args(input_args, output_args, x):
     # TODO: check if special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
+    output_args["filter_hw_device"] = "foo"
+    output_args["vf"] = "format=nv12|vaapi,hwupload"
     return input_args, output_args, False
 
 

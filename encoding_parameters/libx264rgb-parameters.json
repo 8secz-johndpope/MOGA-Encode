@@ -47,7 +47,7 @@
     "CRF": {
         "bounds":{
             "aq-strength": [0.1, 1.9, "f"],
-            "crf": [0, 40, "i"],
+            "crf": [1, 40, "i"],
             "preset": [0, 6, "c"],
             "tune": [0, 3, "c"], 
             "me_method": [0, 4, "c"],
@@ -82,7 +82,15 @@
             "weightp": ["none", "simple", "smart"],
             "b-pyramid": ["none", "strict", "normal"]
         }
-    }
+    },
+    "Near-LL": {
+        "bounds":{
+            "crf": [0, 0, "i"],
+            "preset": [0, 0, "c"]
+        },
+        "categorical":{
+            "preset": ["veryslow"]
+        }
 }
 
 

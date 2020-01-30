@@ -45,7 +45,7 @@
         "bounds":{
             "cq": [1, 40, "i"],
             "preset": [0, 5, "c"],
-            "rc": [0, 0, "c"],
+            "rc": [0, 1, "c"],
             "aq-strength": [1, 15, "i"],
             "rc-lookahead": [0, 60, "i"],
             "surfaces": [0, 64, "i"],
@@ -64,7 +64,7 @@
     },
     "LL":{
         "bounds":{
-            "preset": [0, 1, "i"]
+            "preset": [0, 1, "c"]
         },
         "categorical":{
             "preset": ["lossless", "losslesshp"]

@@ -52,49 +52,6 @@ def img_to_vid(images_dir, decision_vector, encoder):
         exit(1)
     return True
 
-def vid_to_vid(img_dir, decision_vector, encoder):
-    '''
-    Converts images of a directory to a video-file
-    '''
-
-    _, output_args, is_two_pass = get_codec_args(decision_vector, encoder)
-
-    logger.debug("Vid -> Vid")
-    logger.debug(str(output_args))
-    in_path = img_dir + "/ll.mkv"
-    out_path = cfg.TEMP_STORAGE_PATH
-
-    if(is_two_pass):
-        try:
-            logger.debug("Applying two passes!")
-            output_args["pass"] = "1"
-            (
-                ffmpeg
-                .input(in_path)
-                .output("/dev/null", **output_args)
-                .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-y")
-                .run(capture_stderr=True)
-            )
-            output_args["pass"] = "2"
-        except ffmpeg.Error as ex:
-            logger.critical("FFMPEG: error converting images to video")
-            logger.critical(ex.stderr.decode('utf8'))
-            exit(1)
-
-    try:
-        (
-            ffmpeg
-            .input(in_path)
-            .output(out_path, **output_args)
-            .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-y")
-            .run(capture_stderr=True)
-        )
-    except ffmpeg.Error as ex:
-        logger.critical("FFMPEG: error converting images to video")
-        logger.critical(ex.stderr.decode('utf8'))
-        exit(1)
-    return True
-
 
 def vid_to_img(images_dir):
     '''
@@ -186,60 +143,4 @@ def get_directory_size(img_path):
     for dirpath, _, filenames in os.walk(img_path):
         for filename in filenames: accumulated_size += os.path.getsize(os.path.join(dirpath, filename))
     return accumulated_size
-
-
-
-
-def loss_test():
-    '''
-    For debugging
-    Test for checking that png compression is completelly lossless.
-    '''
-
-    original_image = "data/frankfurt/frankfurt_000000_000294_leftImg8bit.png"
-
-    print("md5 checksum for original image")
-    (
-        ffmpeg
-        .input(original_image)
-        .output("-", format="md5")
-        .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-nostats")
-        .run()
-    )
-
-    print("md5 checksums for png-compressed images:  (comp-lvl: 100 and comp-lvl: 0)")
-    (
-        ffmpeg
-        .input(original_image)
-        .output("output_img100.png", compression_level=100)
-        .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-nostats")
-        .run()
-    )
-    (
-        ffmpeg
-        .input(original_image)
-        .output("output_img0.png", compression_level=0)
-        .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-nostats")
-        .run()
-    )
-    (
-        ffmpeg
-        .input("output_img100.png")
-        .output("-", format="md5")
-        .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-nostats")
-        .run()
-    )
-    (
-        ffmpeg
-        .input("output_img0.png")
-        .output("-", format="md5")
-        .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-nostats")
-        .run()
-    )
-
-
-
-if(__name__ == "__main__"):
-    loss_test()
-
 

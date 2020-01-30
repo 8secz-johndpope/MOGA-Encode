@@ -91,6 +91,7 @@
         "categorical":{
             "preset": ["veryslow"]
         }
+    }
 }
 
 

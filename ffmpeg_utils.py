@@ -66,7 +66,7 @@ def vid_to_img(images_dir):
         ( 
             ffmpeg
             .input(file_dir)
-            .output(filenaming, compression_level=cfg.IMG_COMP_LVL)  # PNG: comp_lvl 1 seems to be fast yet small enough
+            .output(filenaming, compression_level=cfg.IMG_COMP_LVL)
             .global_args('-loglevel', 'error', "-stats", "-hide_banner", "-y")
             .run(capture_stderr=True)
         )

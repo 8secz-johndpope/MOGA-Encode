@@ -17,13 +17,15 @@
         "categorical":{
             "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],
             "rc": ["cbr", "vbr", "cbr_hq", "vbr_hq"]
+        },
+        "constants":{
+            "pix_fmt": "yuv444p"
         }
     },
     "CQP":{
         "bounds":{
             "qp": [1, 40, "i"],
             "preset": [0, 5, "c"],
-            "rc": [0, 0, "c"],
             "aq-strength": [1, 15, "i"],
             "rc-lookahead": [0, 60, "i"],
             "surfaces": [0, 64, "i"],
@@ -35,8 +37,11 @@
             "strict_gop": [0, 1, "i"]
         },
         "categorical":{
-            "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],
-            "rc": ["constqp"]
+            "preset": ["fast", "medium", "slow", "hp", "hq", "bd"]
+        },
+        "constants":{
+            "rc": "constqp",
+            "pix_fmt": "yuv444p"
         }
     },
     "VBR-CQ":{
@@ -57,6 +62,10 @@
         "categorical":{
             "preset": ["fast", "medium", "slow", "hp", "hq", "bd"],
             "rc": ["vbr", "vbr_hq"]
+        },
+        "constants":{
+            "pix_fmt": "yuv444p",
+            "cbr": "0"
         }
     },
     "LL":{
@@ -65,6 +74,9 @@
         },
         "categorical":{
             "preset": ["lossless", "losslesshp"]
+        },
+        "constants":{
+            "pix_fmt": "yuv420p"
         }
     }
 }

@@ -54,6 +54,7 @@ opt_high_bounds = None
 opt_low_bounds = None
 opt_type = None
 opt_cat_values = None
+opt_constants = None
 video_encoder = None
 no_continous = None
 
@@ -61,7 +62,7 @@ def load_params_from_json(video_codec):
     '''
     Load optimisation parameters and bounds from dictionary
     '''
-    global opt_params, opt_high_bounds, opt_low_bounds, opt_cat_values, video_encoder, opt_type, no_continous
+    global opt_params, opt_high_bounds, opt_low_bounds, opt_cat_values, video_encoder, opt_type, no_continous, opt_constants
 
     JSON_PARAM_PATH = "encoding_parameters/" + video_codec + "-parameters.json"
     video_encoder = video_codec
@@ -81,6 +82,7 @@ def load_params_from_json(video_codec):
         json_params = json_params[RATE_CONTROL[video_codec]]
         param_bounds = json_params["bounds"]
         opt_cat_values = json_params["categorical"]
+        opt_constants = json_params["constants"]
     except Exception as e:
         logger.critical("Faulty JSON file or configuration, KeyError:" + str(e))
         exit(1)

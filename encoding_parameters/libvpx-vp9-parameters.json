@@ -8,6 +8,11 @@
         "values":{
             "deadline": ["realtime", "good", "best"],
             "pass": ["1", "2"]
+        },
+        "constants":{
+            "pix_fmt": "yuv444p",
+            "row-mt": "1",
+            "tiles": "2x2"
         }
     }
 }

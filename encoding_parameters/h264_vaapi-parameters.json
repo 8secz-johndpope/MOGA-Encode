@@ -16,6 +16,9 @@
         "categorical":{
             "rc_mode": ["CBR", "VBR", "AVBR"],
             "coder": ["ac", "vlc"]
+        },
+        "constants":{
+            "pix_fmt": "nv12"
         }
     },
     "CQP":{
@@ -33,6 +36,9 @@
         "categorical":{
             "rc_mode": ["CQP", "ICQ"],
             "coder": ["ac", "vlc"]
+        },
+        "constants":{
+            "pix_fmt": "nv12"
         }
     }
 }

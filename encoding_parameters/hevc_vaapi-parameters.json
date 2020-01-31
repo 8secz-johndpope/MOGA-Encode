@@ -14,6 +14,9 @@
         },
         "categorical":{
             "rc_mode": ["CBR", "VBR", "AVBR"]
+        },
+        "constants":{
+            "pix_fmt": "nv12"
         }
     },
     "CQP":{
@@ -29,6 +32,9 @@
         },
         "categorical":{
             "rc_mode": ["CQP", "ICQ"]
+        },
+        "constants":{
+            "pix_fmt": "nv12"
         }
     }
 }

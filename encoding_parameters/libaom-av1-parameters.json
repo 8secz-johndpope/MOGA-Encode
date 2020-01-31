@@ -3,7 +3,14 @@
         "bounds":{
             "b:v": [2, 50, "f"]
         },
-        "categorical":{}
+        "categorical":{},
+        "constants":{
+            "pix_fmt": "yuv444p",
+            "row-mt": "1",
+            "tiles": "2x2",
+            "threads": "16",
+            "strict": "experimental"
+        }
     }
 }
 

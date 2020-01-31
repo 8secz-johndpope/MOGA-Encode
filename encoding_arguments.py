@@ -19,6 +19,9 @@ def get_codec_args(decision_vector, encoder):
         "format": 'mp4'
     }
 
+    for key in cfg.opt_constants.keys():
+        output_args[key] = cfg.opt_constants[key]
+
     for i in range(0, len(cfg.opt_params)):
         arg_val = None
         param_name = cfg.opt_params[i]
@@ -41,7 +44,7 @@ def get_codec_args(decision_vector, encoder):
     # Set the conditional arguments
     if(encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
     elif(encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
-    elif(encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
+    elif(encoder == "libx264rgb"): return get_libx264_args(input_args, output_args, decision_vector)
     elif(encoder == "libx265"): return get_libx265_args(input_args, output_args, decision_vector)
     elif(encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
@@ -54,7 +57,6 @@ def get_codec_args(decision_vector, encoder):
 
 def get_libx264_args(input_args, output_args, x):
     
-    output_args["pix_fmt"] = "rgb"
     is_two_pass = False
 
     # Constant bitrate with constrained encoding
@@ -74,6 +76,7 @@ def get_libx264_args(input_args, output_args, x):
 
     if(output_args["coder"] == "vlc"): del output_args["trellis"]
     if(output_args["subq"] == 10 and (output_args["aq-mode"]==0 or output_args["trellis"]!= 2)): del output_args["subq"]
+    if(output_args["psy"] == 1 and not (output_args["subq"] >= 6 and output_args["trellis"] >= 1)): output_args["psy"] == 0
 
     # Remove tune flag if no tuning parameter is passed
     try:
@@ -81,15 +84,21 @@ def get_libx264_args(input_args, output_args, x):
     except Exception:
         logger.debug("No tune parameter found, continuing...")
 
+    try:
+        if "deblock-alpha" in output_args:
+            output_args["deblock"] = str(output_args["deblock-alpha"]) + ":" + str(output_args["deblock-beta"])
+            del output_args["deblock-alpha"]
+            del output_args["deblock-beta"]
+    except Exception:
+        logger.debug("No deblock parameter found, continuing...")
+
+
     return input_args, output_args, is_two_pass
 
 
 
 def get_libx265_args(input_args, output_args, x):
-
-    # TODO: fix conditions
-    output_args["pix_fmt"] = "yuvj444p"
-
+    
     if(output_args["coder"] == "vlc"): del output_args["trellis"]
 
     # Remove tune flag if no tuning parameter is passed
@@ -106,21 +115,16 @@ def get_libx265_args(input_args, output_args, x):
 
 
 def get_h264_nvenc_args(input_args, output_args, x):
-    output_args["pix_fmt"] = "rgb0"
     input_args["hwaccel"] = "nvdec"
     return input_args, output_args, False
 
 
 def get_hevc_nvenc_args(input_args, output_args, x):
-    output_args["pix_fmt"] = "rgb0"
     input_args["hwaccel"] = "nvdec"
-    output_args["b_ref_mode:v"]= "middle"
-
     return input_args, output_args, False
 
 
 def get_h264_vaapi_args(input_args, output_args, x):
-    # TODO: check if more special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
@@ -128,7 +132,6 @@ def get_h264_vaapi_args(input_args, output_args, x):
 
 
 def get_hevc_vaapi_args(input_args, output_args, x):
-    # TODO: check if more special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
@@ -136,7 +139,6 @@ def get_hevc_vaapi_args(input_args, output_args, x):
 
 
 def get_vp9_vaapi_args(input_args, output_args, x):
-    # TODO: check if special arguments are to be added
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
@@ -144,24 +146,13 @@ def get_vp9_vaapi_args(input_args, output_args, x):
 
 
 def get_libvpxvp9_args(input_args, output_args, x):
-    # TODO: check if special arguments are to be added
-
     # Checks if one or two passes are to be done
     is_two_pass = True if output_args["pass"]=="2" else False
     del output_args["pass"]
-
-    output_args["row-mt"] = "1"
-    output_args["tiles"] = "2x2"
-
     return input_args, output_args, is_two_pass
 
 
 def get_libaomav1_args(input_args, output_args, x):
-    # TODO: check if special arguments are to be added
-    output_args["row-mt"] = "1"
-    output_args["tiles"] = "2x2"
-    output_args["threads"] = "16"
-    output_args["strict"] = "experimental"
     return input_args, output_args, False
 
 

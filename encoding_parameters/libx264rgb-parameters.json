@@ -13,6 +13,10 @@
             "aq-mode":  [0, 2, "c"],
             "weightp":  [0, 2, "c"],
             "b-pyramid": [0, 2, "c"],
+            "direct-pred": [0, 3, "c"],
+            "deblock-alpha": [-2, 2, "i"],
+            "deblock-beta": [-2, 2, "i"],
+            "psy": [0, 1, "i"],
             "weightb": [0, 1, "i"],
             "b_strategy": [0, 2, "i"],
             "g": [50, 1000, "i"],
@@ -36,12 +40,15 @@
             "tune": ["none", "stillimage", "film", "grain"],
             "preset": ["medium", "slow", "slower", "veryslow", "placebo"],
             "pass": ["1", "2"],
+            "direct-pred": ["none", "spatial", "temporal", "auto"],
             "me_method": ["dia", "hex", "umh", "esa", "tesa"],
             "coder": ["ac", "vlc"],
             "cmp": ["chroma", "sad"],
             "aq-mode": ["none", "variance", "autovariance"],
             "weightp": ["none", "simple", "smart"],
             "b-pyramid": ["none", "strict", "normal"]
+        },
+        "constants":{
         }
     },
     "CRF": {
@@ -56,6 +63,9 @@
             "aq-mode":  [0, 2, "c"],
             "weightp":  [0, 2, "c"],
             "b-pyramid": [0, 2, "c"],
+            "direct-pred": [0, 3, "c"],
+            "deblock-alpha": [-2, 2, "i"],
+            "deblock-beta": [-2, 2, "i"],
             "weightb": [0, 1, "i"],
             "b_strategy": [0, 2, "i"],
             "g": [50, 1000, "i"],
@@ -76,11 +86,14 @@
             "tune": ["none", "stillimage", "film", "grain"],
             "preset": ["veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"],
             "me_method": ["dia", "hex", "umh", "esa", "tesa"],
+            "direct-pred": ["none", "spatial", "temporal", "auto"],
             "coder": ["ac", "vlc"],
             "cmp": ["chroma", "sad"],
             "aq-mode": ["none", "variance", "autovariance"],
             "weightp": ["none", "simple", "smart"],
             "b-pyramid": ["none", "strict", "normal"]
+        },
+        "constants":{
         }
     },
     "Near-LL": {
@@ -90,6 +103,8 @@
         },
         "categorical":{
             "preset": ["veryslow"]
+        },
+        "constants":{
         }
     }
 }

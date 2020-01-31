@@ -76,7 +76,7 @@
             "preset": ["lossless", "losslesshp"]
         },
         "constants":{
-            "pix_fmt": "yuv420p"
+            "pix_fmt": "yuv444p"
         }
     }
 }

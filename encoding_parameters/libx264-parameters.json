@@ -49,6 +49,7 @@
             "b-pyramid": ["none", "strict", "normal"]
         },
         "constants":{
+            "pix_fmt": "yuv444p"
         }
     },
     "CRF": {
@@ -94,6 +95,7 @@
             "b-pyramid": ["none", "strict", "normal"]
         },
         "constants":{
+            "pix_fmt": "yuv444p"
         }
     },
     "Near-LL": {
@@ -104,7 +106,8 @@
             "preset": ["veryfast", "placebo"]
         },
         "constants":{
-            "crf": "0"
+            "crf": "0",
+            "pix_fmt": "yuv444p"
         }
     }
 }

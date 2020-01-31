@@ -40,7 +40,7 @@
             "b-pyramid": ["none", "strict", "normal"]
         },
         "constants":{
-            "pix_fmt": "yuvj444p"
+            "pix_fmt": "yuv444p"
         }
     }
 }

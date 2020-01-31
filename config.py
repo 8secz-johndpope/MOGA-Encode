@@ -22,14 +22,15 @@ ML_PERFORMANCE_BASELINE = 0.793947687576
 # optimization_problem parameters
 ML_DATA_INPUT = "/data/untouched_big/"
 ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
-VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265", "libvpx-vp9"] # TODO: Add vaapi codecs
-RATE_CONTROL = {"h264_nvenc": "CBR",
-                "hevc_nvenc": "CBR",
-                "libx264": "CRF",
-                "libx265": "CBR",
-                "h264_vaapi": "CBR",
-                "hevc_vaapi": "CBR",
-                "libvpx-vp9": "CBR"}
+VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265"]
+RATE_CONTROL = { "h264_nvenc": ["CBR", "CQP"],
+                 "hevc_nvenc": ["CBR", "CQP"],
+                 "libx264":    ["CBR", "CRF"],
+                 "libx264rgb": ["CBR", "CRF"],
+                 "libx265":    ["CBR"],
+                 "h264_vaapi": ["CBR"],
+                 "hevc_vaapi": ["CBR"],
+                 "libvpx-vp9": ["CBR"] }
 
 # ffmpeg_utils parameters
 TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
@@ -58,7 +59,7 @@ opt_constants = None
 video_encoder = None
 no_continous = None
 
-def load_params_from_json(video_codec):
+def load_params_from_json(video_codec, rate_control):
     '''
     Load optimisation parameters and bounds from dictionary
     '''
@@ -79,7 +80,7 @@ def load_params_from_json(video_codec):
         json_params = json.load(f)
 
     try:
-        json_params = json_params[RATE_CONTROL[video_codec]]
+        json_params = json_params[rate_control]
         param_bounds = json_params["bounds"]
         opt_cat_values = json_params["categorical"]
         opt_constants = json_params["constants"]

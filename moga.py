@@ -71,47 +71,47 @@ def uniform_init(prob, pop):
 
 
 
-def sweetspot_search(codec_arg, moga_arg):
+def sweetspot_search(codec_arg, rate_control_arg, moga_arg):
     '''
     Evolves a population with a given optimization algorithm
     '''
 
     # Change optimisation config if a specific argument is set
     if codec_arg is not None: cfg.VIDEO_ENCODERS = [codec_arg]
+    if rate_control_arg is not None: cfg.RATE_CONTROL[codec_arg] = [rate_control_arg]
     if moga_arg is not None: cfg.MOG_ALGS = [moga_arg]
-
+    
 
     # Evaluate each codec in VIDEO_ENCODERS list
     for codec in cfg.VIDEO_ENCODERS:
-        logger.info("Optimising the " + codec + " video-codec...")
 
-        # Load parameters for codec
-        cfg.load_params_from_json(codec)
+        for rate_control in cfg.RATE_CONTROL[codec]:
+            # Load parameters for codec
+            cfg.load_params_from_json(codec, rate_control)
+            logger.info("Optimising " + codec + " using " + rate_control + "...")
 
-        for epoch in range(1, cfg.EPOCHS+1):
+            for epoch in range(1, cfg.EPOCHS+1):
 
-            for alg in cfg.MOG_ALGS:
-                cfg.epoch = epoch
-                cfg.mog_alg = alg
-                logger.info("----------- EPOCH: " + str(epoch) + " Alg: " + alg + " ------------")
+                for alg in cfg.MOG_ALGS:
+                    cfg.epoch = epoch
+                    cfg.mog_alg = alg
+                    logger.info("----------- EPOCH: " + str(epoch) + " Alg: " + alg + " ------------")
 
-                # Get optimization problem and algorithm
-                opt_prob = pyg.problem(sweetspot_problem())
+                    # Get optimization problem and algorithm
+                    opt_prob = pyg.problem(sweetspot_problem())
 
-                # Initiate population
-                rand_seed = epoch*3+1  # An arbitrary but repeatable randomisation seed
-                # random.seed(rand_seed)
-                pop = pyg.population(prob=opt_prob, seed=rand_seed)
-                pop = uniform_init(opt_prob, pop)
+                    # Initiate population
+                    rand_seed = epoch*3+1  # An arbitrary but repeatable randomisation seed
+                    # random.seed(rand_seed)
+                    pop = pyg.population(prob=opt_prob, seed=rand_seed)
+                    pop = uniform_init(opt_prob, pop)
 
-                # Set up optimization algorithm
-                opt_alg = get_optimization_algorithm(rand_seed)
+                    # Set up optimization algorithm
+                    opt_alg = get_optimization_algorithm(rand_seed)
 
-                # Evolve pop using opt_alg
-                logger.debug("Starting evolution process")
-                pop = opt_alg.evolve(pop)
-
-            #log_stats(pop)
+                    # Evolve pop using opt_alg
+                    logger.debug("Starting evolution process")
+                    pop = opt_alg.evolve(pop)
 
 
 
@@ -221,6 +221,7 @@ if(__name__ == "__main__"):
     parser = argparse.ArgumentParser(description='Multi objective genetic algorithm')
     parser.add_argument('-a', '--moga', default=None, help="Evaluate using specific ML-algorithm")
     parser.add_argument('-c', '--codec', default=None, help="Evaluate a specific codec")
+    parser.add_argument('-rc', '--ratecontrol', default=None, help="Evaluate a specific rate control")
     parser.add_argument('-r', '--resume', default=None, help="Resume optimisation using CSV-file")
     parser.add_argument('-rs', '--rstart', type=int, default=None, help="Start index of generation to resume")
     parser.add_argument('-re', '--rend', type=int, default=None, help="End index of generation to resume")
@@ -231,7 +232,7 @@ if(__name__ == "__main__"):
 
     if(args.resume == None):
         # Start sweetspot search
-        sweetspot_search(args.codec, args.moga)
+        sweetspot_search(args.codec, args.ratecontrol, args.moga)
     else:
         if(args.rstart == None and
            args.rend == None and

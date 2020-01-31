@@ -76,13 +76,12 @@
     },
     "LL":{
         "bounds":{
-            "pix_fmt": [0, 4, "c"]
+            "preset": [0, 0, "c"]
         },
         "categorical":{
-            "pix_fmt": ["yuv420p", "nv12", "yuv444p", "yuv444p16le", "rgb0"]
+            "preset": ["lossless"]
         },
         "constants":{
-            "preset": "lossless"
         }
     }
 }

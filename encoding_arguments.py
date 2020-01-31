@@ -44,7 +44,7 @@ def get_codec_args(decision_vector, encoder):
     # Set the conditional arguments
     if(encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
     elif(encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
-    elif(encoder == "libx264rgb"): return get_libx264_args(input_args, output_args, decision_vector)
+    elif(encoder == "libx264rgb" or encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
     elif(encoder == "libx265"): return get_libx265_args(input_args, output_args, decision_vector)
     elif(encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
     elif(encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
@@ -74,9 +74,12 @@ def get_libx264_args(input_args, output_args, x):
         if output_args["pass"]=="2": is_two_pass = True
         del output_args["pass"]
 
-    if(output_args["coder"] == "vlc"): del output_args["trellis"]
-    if(output_args["subq"] == 10 and (output_args["aq-mode"]==0 or output_args["trellis"]!= 2)): del output_args["subq"]
-    if(output_args["psy"] == 1 and not (output_args["subq"] >= 6 and output_args["trellis"] >= 1)): output_args["psy"] == 0
+    if cfg.RATE_CONTROL["libx264rgb"] != "Near-LL":
+        # Adjust parameters according to compatability
+        if(output_args["coder"] == "vlc"): del output_args["trellis"]
+        if(output_args["subq"] == 10 and (output_args["aq-mode"]==0 or output_args["trellis"]!= 2)): del output_args["subq"]
+        if(output_args["psy"] == 1 and not (output_args["subq"] >= 6 and output_args["trellis"] >= 1)): output_args["psy"] == 0
+
 
     # Remove tune flag if no tuning parameter is passed
     try:
@@ -142,12 +145,16 @@ def get_libx265_args(input_args, output_args, x):
 
 
 def get_h264_nvenc_args(input_args, output_args, x):
+    # Add hardware decoding flag
     input_args["hwaccel"] = "nvdec"
+    # NVENC handles two-pass internally, hence returning False
     return input_args, output_args, False
 
 
 def get_hevc_nvenc_args(input_args, output_args, x):
+    # Add hardware decoding flag
     input_args["hwaccel"] = "nvdec"
+    # NVENC handles two-pass internally, hence returning False
     return input_args, output_args, False
 
 

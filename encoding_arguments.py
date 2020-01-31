@@ -98,14 +98,41 @@ def get_libx264_args(input_args, output_args, x):
 
 
 def get_libx265_args(input_args, output_args, x):
-    
-    if(output_args["coder"] == "vlc"): del output_args["trellis"]
 
     # Remove tune flag if no tuning parameter is passed
     try:
         if(output_args["tune"] == "none"): del output_args["tune"]
     except Exception:
         logger.debug("No tune parameter found, continuing...")
+
+    x265_params =  "aq-strength=" + str(output_args["aq-strength"])
+    del output_args["aq-strength"]
+    x265_params += ":ctu=" + str(output_args["ctu"])
+    del output_args["ctu"]
+    x265_params += ":min-cu-size="  + str(output_args["min-cu-size"])
+    del output_args["min-cu-size"]
+    x265_params += ":me="  + str(output_args["me"])
+    del output_args["me"]
+    x265_params += ":aq-mode=" + str(output_args["aq-mode"])
+    del output_args["aq-mode"]
+    x265_params += ":weightp=" + str(output_args["weightp"])
+    del output_args["weightp"]
+    x265_params += ":b-pyramid=" + str(output_args["b-pyramid"])
+    del output_args["b-pyramid"]
+    x265_params += ":weightb=" + str(output_args["weightb"])
+    del output_args["weightb"]
+    x265_params += ":scenecut=" + str(output_args["scenecut"])
+    del output_args["scenecut"]
+    x265_params += ":merange=" + str(output_args["merange"])
+    del output_args["merange"]
+    x265_params += ":subme=" + str(output_args["subme"])
+    del output_args["subme"]
+    x265_params += ":rc-lookahead=" + str(output_args["rc-lookahead"])
+    del output_args["rc-lookahead"]
+    x265_params += ":bframe-bias =" + str(output_args["bframe-bias"])
+    del output_args["bframe-bias"]
+
+    output_args["x265-params"] = x265_params
 
     # Checks if one or two passes are to be done
     is_two_pass = True if output_args["pass"]=="2" else False

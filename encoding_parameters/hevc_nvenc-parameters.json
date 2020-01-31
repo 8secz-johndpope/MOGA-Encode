@@ -21,7 +21,7 @@
             "b_ref_mode": ["0", "2"]
         },
         "constants":{
-            "pix_fmt": "yuv420p"
+            "pix_fmt": "yuv444p"
         }
     },
     "CQP":{
@@ -45,7 +45,7 @@
         },
         "constants":{
             "rc": "constqp",
-            "pix_fmt": "yuv420p"
+            "pix_fmt": "yuv444p"
         }
     },
     "VBR-CQ":{

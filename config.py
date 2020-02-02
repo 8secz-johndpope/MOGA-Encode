@@ -23,7 +23,7 @@ ML_PERFORMANCE_BASELINE = 0.793947687576
 ML_DATA_INPUT = "/data/untouched_big/"
 ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
 VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265"]
-RATE_CONTROL = { "h264_nvenc": ["CBR", "CQP"],
+RATE_CONTROLS = { "h264_nvenc": ["CBR", "CQP"],
                  "hevc_nvenc": ["CBR", "CQP"],
                  "libx264":    ["CBR", "CRF"],
                  "libx264rgb": ["CBR", "CRF"],
@@ -57,16 +57,18 @@ opt_type = None
 opt_cat_values = None
 opt_constants = None
 video_encoder = None
+rate_control = None
 no_continous = None
 
-def load_params_from_json(video_codec, rate_control):
+def load_params_from_json(encoder, r_control):
     '''
     Load optimisation parameters and bounds from dictionary
     '''
-    global opt_params, opt_high_bounds, opt_low_bounds, opt_cat_values, video_encoder, opt_type, no_continous, opt_constants
+    global opt_params, opt_high_bounds, opt_low_bounds, opt_cat_values, video_encoder, rate_control, opt_type, no_continous, opt_constants
 
-    JSON_PARAM_PATH = "encoding_parameters/" + video_codec + "-parameters.json"
-    video_encoder = video_codec
+    JSON_PARAM_PATH = "encoding_parameters/" + encoder + "-parameters.json"
+    video_encoder = encoder
+    rate_control = r_control
 
     opt_params = []
     opt_high_bounds = []

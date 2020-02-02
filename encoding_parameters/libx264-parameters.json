@@ -30,7 +30,7 @@
             "qmax": [25, 50, "i"],
             "qdiff": [1, 8, "i"],
             "me_range": [12, 24, "i"],
-            "subq": [1, 10, "i"],
+            "subq": [1, 9, "i"],
             "rc-lookahead": [20, 60, "i"],
             "b-bias": [-100, 100, "i"],
             "mixed-refs": [0, 1, "i"],

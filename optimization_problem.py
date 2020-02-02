@@ -133,7 +133,8 @@ class sweetspot_problem:
         if( (len(self.fitness_of_gen) >= cfg.POP_SIZE)):
 
             # Name used to identify plots and files
-            name = ("Epoch: " + str(cfg.epoch) + " MOGA: " + cfg.mog_alg + " Codec: " + cfg.video_encoder)
+            name = (cfg.video_encoder + ":" + cfg.rate_control + " at epoch:" +
+                    str(cfg.epoch) + " of MOGA: " + cfg.mog_alg)
 
             # If this is the last generation, plot and print extended epoch information
             if(self.gen == cfg.NO_GENERATIONS):
@@ -147,14 +148,14 @@ class sweetspot_problem:
                 pl.plot_front(name +" all fits", fitness_values, ndf)
                 
                 # Save ndf results to file
-                with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/ndf-epoch'+str(cfg.epoch)+"-codec"+ cfg.video_encoder +'.csv', mode='w') as data_file:
+                with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/NDF-' + name + '.csv', mode='w') as data_file:
                     data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     for i in ndf:
                         data = np.concatenate((fitness_keys[i], fitness_values[i]), axis=None)
                         data_writer.writerow(data)
 
             # Plot generation specific information
-            pl.plot_front(name +" gen "+str(self.gen), self.fitness_of_gen)
+            pl.plot_front(name +" at gen:"+str(self.gen), self.fitness_of_gen)
             self.fitness_of_gen = []
             self.gen += 1
 

@@ -78,14 +78,14 @@ def sweetspot_search(codec_arg, rate_control_arg, moga_arg):
 
     # Change optimisation config if a specific argument is set
     if codec_arg is not None: cfg.VIDEO_ENCODERS = [codec_arg]
-    if rate_control_arg is not None: cfg.RATE_CONTROL[codec_arg] = [rate_control_arg]
+    if rate_control_arg is not None: cfg.RATE_CONTROLS[codec_arg] = [rate_control_arg]
     if moga_arg is not None: cfg.MOG_ALGS = [moga_arg]
     
 
     # Evaluate each codec in VIDEO_ENCODERS list
     for codec in cfg.VIDEO_ENCODERS:
 
-        for rate_control in cfg.RATE_CONTROL[codec]:
+        for rate_control in cfg.RATE_CONTROLS[codec]:
             # Load parameters for codec
             cfg.load_params_from_json(codec, rate_control)
             logger.info("Optimising " + codec + " using " + rate_control + "...")

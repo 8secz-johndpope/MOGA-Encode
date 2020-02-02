@@ -7,12 +7,12 @@ import config as cfg
 logger = logging.getLogger('gen-alg')
 
 
-def img_to_vid(images_dir, decision_vector, encoder):
+def img_to_vid(images_dir, decision_vector):
     '''
     Converts images of a directory to a video-file
     '''
 
-    input_args, output_args, is_two_pass = get_codec_args(decision_vector, encoder)
+    input_args, output_args, is_two_pass = get_codec_args(decision_vector)
 
     logger.debug("Img -> Vid")
     logger.debug(str(input_args)+ " " +str(output_args))
@@ -76,21 +76,19 @@ def vid_to_img(images_dir):
         exit(1)
 
 
-def transcode(img_path, output_dir, decision_vector, encoder="NA"):
+def transcode(img_path, output_dir, decision_vector):
     '''
     Handles the process of transcoding images -> compressed-video -> images
     with potential compression artifacts.
     The function returns the file size of the compressed-video
     '''
-    if(encoder == "NA"): encoder = cfg.video_encoder
 
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
     filenames = get_names(img_path)
 
-    img_to_vid(img_path, decision_vector, encoder)
-    #vid_to_vid(img_path, decision_vector, encoder)
+    img_to_vid(img_path, decision_vector)
     vid_to_img(output_dir)
 
     vid_size = os.path.getsize(cfg.TEMP_STORAGE_PATH)

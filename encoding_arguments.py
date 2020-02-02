@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger('gen-alg')
 import config as cfg
 
-def get_codec_args(decision_vector, encoder):
+def get_codec_args(decision_vector):
     '''
     Sets input and output arguments for encoding according to the
     decision vector "x" and the encoder.
@@ -15,7 +15,7 @@ def get_codec_args(decision_vector, encoder):
         "framerate": "30"
     }
     output_args = {
-        "c:v": encoder,
+        "c:v": cfg.video_encoder,
         "format": 'mp4'
     }
 
@@ -42,15 +42,15 @@ def get_codec_args(decision_vector, encoder):
 
 
     # Set the conditional arguments
-    if(encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
-    elif(encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
-    elif(encoder == "libx264rgb" or encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
-    elif(encoder == "libx265"): return get_libx265_args(input_args, output_args, decision_vector)
-    elif(encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
-    elif(encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
-    elif(encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
-    elif(encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, decision_vector)
-    elif(encoder == "libaom-av1"): return get_libaomav1_args(input_args, output_args, decision_vector)
+    if(cfg.video_encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "libx264rgb" or cfg.video_encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "libx265"): return get_libx265_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "libaom-av1"): return get_libaomav1_args(input_args, output_args, decision_vector)
     else: raise Exception("Could not find codec")
 
 
@@ -74,10 +74,10 @@ def get_libx264_args(input_args, output_args, x):
         if output_args["pass"]=="2": is_two_pass = True
         del output_args["pass"]
 
-    if cfg.RATE_CONTROL["libx264rgb"] != "Near-LL":
+    if cfg.rate_control != "Near-LL":
         # Adjust parameters according to compatability
-        if(output_args["coder"] == "vlc"): del output_args["trellis"]
-        if(output_args["subq"] == 10 and (output_args["aq-mode"]==0 or output_args["trellis"]!= 2)): del output_args["subq"]
+        if(output_args["coder"] == "vlc"): output_args["trellis"] = 0
+        if(output_args["subq"] == 10 and (output_args["aq-mode"]==0 or output_args["trellis"]!= 2)): output_args["subq"] = 9
         if(output_args["psy"] == 1 and not (output_args["subq"] >= 6 and output_args["trellis"] >= 1)): output_args["psy"] == 0
 
 

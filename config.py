@@ -18,9 +18,10 @@ EPOCHS = 1
 PLOT_PATH = "/output/results/"
 FITNESS_DATA_PATH = "/output/results/"
 ML_PERFORMANCE_BASELINE = 0.793947687576
+ML_PERFORMANCE_MEASURE = "mean_IoU"
 
 # optimization_problem parameters
-ML_DATA_INPUT = "/data/untouched_big/"
+ML_DATA_INPUT = "/data/untouched_full/"
 ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
 VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265"]
 RATE_CONTROLS = { "h264_nvenc": ["CBR", "CQP"],

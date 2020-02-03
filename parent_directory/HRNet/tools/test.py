@@ -42,12 +42,13 @@ def parse_args(command_args):
                         help="Modify config options using the command-line",
                         default=None,
                         nargs=argparse.REMAINDER)
+    
     args = parser.parse_args(command_args)
     update_config(config, args)
 
     return args
 
-def main(command_args=None):
+def main(command_args):
     
     parse_args(command_args)
 
@@ -57,16 +58,25 @@ def main(command_args=None):
     cudnn.enabled = config.CUDNN.ENABLED
 
     # build model
+    if torch.__version__.startswith('1'):
+        module = eval('models.'+config.MODEL.NAME)
+        module.BatchNorm2d_class = module.BatchNorm2d = torch.nn.BatchNorm2d
     model = eval('models.'+config.MODEL.NAME +
                  '.get_seg_model')(config)
+
+    dump_input = torch.rand(
+        (1, 3, config.TEST.IMAGE_SIZE[1], config.TEST.IMAGE_SIZE[0])
+    )
 
     if config.TEST.MODEL_FILE:
         model_state_file = config.TEST.MODEL_FILE
     else:
-        print("No modelfile found")
+        model_state_file = os.path.join(final_output_dir,
+                                        'best.pth')
     
     pretrained_dict = torch.load(model_state_file)
     model_dict = model.state_dict()
+    #assert set(k[6:] for k in pretrained_dict) == set(model_dict)
     pretrained_dict = {k[6:]: v for k, v in pretrained_dict.items()
                         if k[6:] in model_dict.keys()}
 
@@ -75,6 +85,7 @@ def main(command_args=None):
 
     gpus = list(config.GPUS)
     model = nn.DataParallel(model, device_ids=gpus).cuda()
+
 
     # prepare data
     test_size = (config.TEST.IMAGE_SIZE[1], config.TEST.IMAGE_SIZE[0])
@@ -96,6 +107,7 @@ def main(command_args=None):
         shuffle=False,
         num_workers=config.WORKERS,
         pin_memory=True)
+    
     
     # Define results to be returned
     mean_IoU, pixel_acc, mean_acc = 0.,0.,0.,

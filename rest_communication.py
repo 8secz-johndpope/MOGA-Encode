@@ -25,8 +25,9 @@ def get_eval_from_ml_alg():
         raise Exception('Error encountered while communicating with the ML-algorithm')
     
     json_body = response.json()
+    result = float(json_body[cfg.ML_PERFORMANCE_MEASURE])
 
-    return json_body["mean_IoU"]
+    return result, json_body
 
 
 

@@ -16,15 +16,13 @@ def index():
 
 command_args = []
 command_args.append("--cfg")
-command_args.append("experiments/cityscapes/seg_small_w18_v2_oscar.yaml")
+command_args.append("experiments/cityscapes/seg_hrnet_ocr_w48_train_oscar.yaml")
 command_args.append("DATASET.ROOT")
 command_args.append("/data/")
 command_args.append("DATASET.TEST_SET")
-command_args.append("list/cityscapes/val.lst")
+command_args.append("list/cityscapes/val_tiny.lst")
 command_args.append("TEST.MODEL_FILE")
-command_args.append("models/hrnet_w18_small_v2_cityscapes_cls19_1024x2048_trainset.pth")
-command_args.append("TEST.FLIP_TEST")
-command_args.append("False")
+command_args.append("models/hrnet_ocr_cs_8162_torch11.pth")
 
 
 @app.route('/eval', methods=['GET'])

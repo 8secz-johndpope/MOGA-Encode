@@ -23,6 +23,7 @@ class sweetspot_problem:
     original_img_size = None
     gen = None
     fitness_of_gen = None
+    complete_results = None
 
 
     def __init__(self):
@@ -31,6 +32,7 @@ class sweetspot_problem:
         self.times = {}
         self.gen = 0
         self.fitness_of_gen = []
+        self.complete_results = {}
         self.original_img_size = ffmpeg_utils.get_directory_size(cfg.ML_DATA_INPUT)
         logger.debug("Problem initiated")
 
@@ -69,7 +71,7 @@ class sweetspot_problem:
 
         if x_id in self.fitness_dict:
             logger.info("Using previous fitness of identical input vector")
-            self.store_results(x, self.fitness_dict[x_id], self.times[x_id])
+            self.store_results(x, self.fitness_dict[x_id], self.times[x_id], self.complete_results[x_id])
             return self.fitness_dict[x_id]
 
         # List all clips to degrade
@@ -101,19 +103,21 @@ class sweetspot_problem:
         logger.info("Time for transcode: " + str(int(round(transcode_time)))+" seconds")
 
         # Retrieve fitness results
-        score = float(rest_communication.get_eval_from_ml_alg())    # Get ML-algorithm results 
+        score, full_response = rest_communication.get_eval_from_ml_alg()    # Get ML-algorithm results 
         comp_ratio = self.original_img_size/comp_size               # Calc compression-ratio
         logger.info("ML-performance: " + str(score) + "\nComp-ratio: " + str(comp_ratio))
+        logger.debug("All measures: " + str(full_response))
 
         self.fitness_dict[x_id] = [-score, -comp_ratio]
         self.times[x_id] = transcode_time
-        self.store_results(x, [-score, -comp_ratio], transcode_time)
+        self.complete_results[x_id] = full_response
+        self.store_results(x, [-score, -comp_ratio], transcode_time, full_response)
 
         # Minimize bitrate, maximize ML-performance
         return [-score, -comp_ratio]  # maximize obj-func -> put a minus sign in front of obj.
 
 
-    def store_results(self, x, fitness, time):
+    def store_results(self, x, fitness, time, full_response):
         '''
         Stores decision vectors and their fitness.
         Plots the fitness of all chromosomes of every generation.
@@ -127,6 +131,7 @@ class sweetspot_problem:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.mog_alg, np.array2string(x, precision = 6, separator=','), str(time)]
             data = np.concatenate((data, fitness), axis=None)
+            data = np.concatenate((data, str(full_response)), axis=None)
             data_writer.writerow(data)
 
 
@@ -152,6 +157,7 @@ class sweetspot_problem:
                     data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     for i in ndf:
                         data = np.concatenate((fitness_keys[i], fitness_values[i]), axis=None)
+                        data = np.concatenate((data, self.complete_results[fitness_keys[i]]), axis=None)
                         data_writer.writerow(data)
 
             # Plot generation specific information

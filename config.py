@@ -17,7 +17,7 @@ MOG_ALGS = ["nsga2"]   # nsga2, nspso, moead
 EPOCHS = 1
 PLOT_PATH = "/output/results/"
 FITNESS_DATA_PATH = "/output/results/"
-ML_PERFORMANCE_BASELINE = 0.793947687576
+ML_PERFORMANCE_BASELINE = 0.8162191842797382
 ML_PERFORMANCE_MEASURE = "mean_IoU"
 
 # optimization_problem parameters

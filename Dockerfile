@@ -500,7 +500,7 @@ FROM        runtime-base AS release
 
 #CMD         ["--help"]
 #ENTRYPOINT  ["ffmpeg"]
-ENTRYPOINT  ["/bin/bash"]
+#ENTRYPOINT  ["/bin/bash"]
 ENV         LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
 
 COPY --from=build /usr/local/bin /usr/local/bin/
@@ -519,11 +519,8 @@ RUN \
 RUN apt-get -y install python3 python3-pip wget make git nano
 
 # pip packages
-RUN pip3 install numpy \
-                 pygmo \
-                 matplotlib \
-                 ffmpeg-python \
-                 requests
-
-COPY . /MOGA-Encode
-WORKDIR /MOGA-Encode
+RUN pip3 install numpy==1.18.1 \
+                 pygmo==2.13.0 \
+                 matplotlib==3.1.3 \
+                 ffmpeg-python==0.2.0 \
+                 requests==2.22.0

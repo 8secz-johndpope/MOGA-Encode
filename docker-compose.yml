@@ -9,8 +9,8 @@ services:
         image: oscar/moga-encode
         network_mode: "host"
         ipc: "host"
-        entrypoint: 'bash'
         volumes:
+            - ./:/MOGA-Encode
             - ../HRNet-mldata:/data
             - ../output:/output
         tmpfs:
@@ -23,6 +23,7 @@ services:
         working_dir: /MOGA-Encode
         stdin_open: true
         tty: true
+        command: python3 moga.py
 
     hrnet:
         container_name: hrnet

@@ -5,38 +5,37 @@ Multi Objective Genetic Algorithm for finding optimal encoding setups
 Docker CE, Docker-compose and nvidia-container-runtime
 
 ## Setup
-### Step 1
+### Step 1 - clone and build
 
-- clone this repository
-- extract the ML-data into the parent directory
-
-### Step 2 - get images
-
-### Alt 1 - load images from archives:
-
-- download archives of hrnet and gen-alg
-- run: docker load < mlalg.tar.gz
-- run: docker load < moga.tar.gz 
-
-### Alt 2 - build from source
-
-- Clone the ML-repository into the parent directory
+- clone this repository (MOGA-Encode)
+- extract the ML-data into the parent directory (../*"ML-rep"*-mldata)
+- Clone the ML-repository into the parent directory of MOGA-Encode
 - cd into MOGA-Encode directory
 - run: docker-compose build
 
 
-### Step 2 - run services:
-
-#### Console 1
+### Step 2 - running services:
 
 - cd into MOGA-Encode directory
-- run: docker-compose run hrnet
+- run: docker-compose run -d *"ml-alg-service"*
+- wait 10 seconds
+- run: docker-compose run -d moga-encode
 
-#### Console 2
+
+#### Debugging
+
+**Console 1**
+
+- cd into *ml-alg-service* directory
+- run: docker-compose run *"ml-alg-service"*
+
+**Console 2**
 
 - cd into MOGA-Encode directory
 - run: docker-compose run moga-encode
 - inside moga-encode, run: python3 moga.py
 
 
+### Stopping services:
 
+Run: docker-compose down

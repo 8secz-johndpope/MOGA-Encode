@@ -180,6 +180,14 @@ def get_vp9_vaapi_args(input_args, output_args, x):
 
 
 def get_libvpxvp9_args(input_args, output_args, x):
+    if 'b:v' in output_args: 
+        try:
+            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
+            del output_args["bufratio"]
+        except Exception:
+            logger.critical("Could not set buffer size, quitting...")
+            exit(1)
+
     # Checks if one or two passes are to be done
     is_two_pass = True if output_args["pass"]=="2" else False
     del output_args["pass"]

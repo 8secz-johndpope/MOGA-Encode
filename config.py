@@ -31,7 +31,8 @@ RATE_CONTROLS = { "h264_nvenc": ["CBR", "CQP"],
                  "libx265":    ["CBR"],
                  "h264_vaapi": ["CBR"],
                  "hevc_vaapi": ["CBR"],
-                 "libvpx-vp9": ["CBR"] }
+                 "libvpx-vp9": ["CBR"],
+                 "libaom-av1": ["CBR"]  }
 
 # ffmpeg_utils parameters
 TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount

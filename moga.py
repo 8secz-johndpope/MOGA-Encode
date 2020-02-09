@@ -3,7 +3,7 @@
 # Imports
 import pygmo as pyg
 import numpy as np
-import random, logging, os, argparse, csv
+import random, logging, os, argparse, csv, pickle
 from datetime import datetime
 
 # Import modules
@@ -23,15 +23,15 @@ def get_optimization_algorithm(randseed):
     if(cfg.mog_alg == "nsga2"):
         # cr: crossover probability, m: mutation probability
         # eta_c: distribution index for crossover, eta_m: distribution index for mutation
-        opt_alg = pyg.algorithm( pyg.nsga2(gen=cfg.NO_GENERATIONS, cr=0.925, m=0.05,
+        opt_alg = pyg.algorithm( pyg.nsga2(gen=1, cr=0.925, m=0.05,
                                            eta_c=10, eta_m=50, seed=randseed) )
     elif(cfg.mog_alg == "moead"):
-        opt_alg = pyg.algorithm ( pyg.moead(gen = cfg.NO_GENERATIONS, weight_generation = "grid",
+        opt_alg = pyg.algorithm ( pyg.moead(gen = 1, weight_generation = "grid",
                                             decomposition = "tchebycheff", neighbours = 5,
                                             CR = 1, F = 0.5, eta_m = 20, realb = 0.9,
                                             limit = 2, preserve_diversity = True) )
     elif(cfg.mog_alg == "nspso"):
-        opt_alg = pyg.algorithm ( pyg.nspso(gen = cfg.NO_GENERATIONS, omega = 0.6, c1 = 0.01, c2 = 0.5, chi = 0.5,
+        opt_alg = pyg.algorithm ( pyg.nspso(gen = 1, omega = 0.6, c1 = 0.01, c2 = 0.5, chi = 0.5,
                                             v_coeff = 0.5, leader_selection_range = 2,
                                             diversity_mechanism = "crowding distance",
                                             memory = False) )
@@ -111,72 +111,44 @@ def sweetspot_search(codec_arg, rate_control_arg, moga_arg):
 
                     # Evolve pop using opt_alg
                     logger.debug("Starting evolution process")
-                    pop = opt_alg.evolve(pop)
+                    for gen in range(1, cfg.NO_GENERATIONS):
+                        logger.info("Generation: " + str(gen+1))
+                        pop = opt_alg.evolve(pop)
+                        pickle.dump( pop, open( cfg.POPULATION_PICKLE_PATH, "wb" ) )                    
 
 
 
-def get_csv_data(recon_info):
-    '''
-    Reconstructs a population from a CSV file
-    '''
-    logger.debug("Repopulating...")
-    # recon_info <- [csv-file, start-index, end-index]
+def resume_optimisation(codec, rate_control, moga, base_gen, epoch):
 
-    with open( recon_info[0], mode='r') as csv_file:
-        data = csv.reader(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        pop_data = []
-        fitness_dict = {}
-        for row in data:
-            index = int(row[0])
-            fit = [float(row[6]), float(row[7])]
-            d_vector = row[4]
-            d_vector = d_vector.strip('\n').strip('[').strip(']')
-            x_id = d_vector
-            d_vector = d_vector.split(',')
-            d_vector = np.array(d_vector, dtype="float32")
-            fitness_dict[x_id] = fit
-            if(recon_info[1] <= index <= recon_info[2]):
-                pop_data.append([d_vector, fit])
-
-        return fitness_dict, pop_data
-
-    logger.critical("Error loading data csv")
-    exit(1)
-
-
-def repopulate_pop(pop, pop_data):
-    for d_vector_data in pop_data:
-        x = d_vector_data[0]
-        fit = d_vector_data[1]
-        pop.push_back(x, fit)
-        logger.debug("Pushing chromosome: " + str(x)+ "\nwith fitness: " + str(fit))
-    return pop
-
-def resume_optimisation(codec_arg, moga_arg, recon_info):
-
+    cfg.VIDEO_ENCODERS = [codec]
+    cfg.RATE_CONTROLS[codec] = [rate_control]
+    cfg.MOG_ALGS = [moga]
+    
     # Load parameters for codec
-    cfg.load_params_from_json(codec_arg)
+    cfg.load_params_from_json(codec, rate_control)
+    logger.info("Optimising " + codec + " using " + rate_control + "...")
 
-    cfg.epoch = 1  # Arbitrary epoch nr
-    cfg.mog_alg = moga_arg
-    cfg.NO_GENERATIONS = recon_info[3]
-    rand_seed = 1
+    cfg.epoch = epoch
+    cfg.mog_alg = moga
+    
+    # Initiate population
+    rand_seed = epoch*3+1  # An arbitrary but repeatable randomisation seed
+    # random.seed(rand_seed)
 
-    # Get optimization problem and algorithm
-    fitness_dict, pop_data = get_csv_data(recon_info)
-    ssp = sweetspot_problem()
-    ssp.fitness_dict = fitness_dict
-    opt_prob = pyg.problem(ssp)
-    pop = pyg.population(prob=opt_prob)
-    pop = repopulate_pop(pop, pop_data)
-    logger.info("Loaded population:\n")
+    logger.debug("Loading population from pickle")
+    pop = pickle.load( open( cfg.POPULATION_PICKLE_PATH, "rb" ) )
     logger.info(pop)
+
     # Set up optimization algorithm
     opt_alg = get_optimization_algorithm(rand_seed)
 
     # Evolve pop using opt_alg
     logger.debug("Starting evolution process")
-    pop = opt_alg.evolve(pop)
+    for gen in range(base_gen, cfg.NO_GENERATIONS):
+        logger.info("Generation: " + str(gen+1))
+        pop = opt_alg.evolve(pop)
+        pickle.dump( pop, open( cfg.POPULATION_PICKLE_PATH, "wb" ) )                    
+
 
 
 def configure_logging():
@@ -222,23 +194,21 @@ if(__name__ == "__main__"):
     parser.add_argument('-a', '--moga', default=None, help="Evaluate using specific ML-algorithm")
     parser.add_argument('-c', '--codec', default=None, help="Evaluate a specific codec")
     parser.add_argument('-rc', '--ratecontrol', default=None, help="Evaluate a specific rate control")
-    parser.add_argument('-r', '--resume', default=None, help="Resume optimisation using CSV-file")
-    parser.add_argument('-rs', '--rstart', type=int, default=None, help="Start index of generation to resume")
-    parser.add_argument('-re', '--rend', type=int, default=None, help="End index of generation to resume")
-    parser.add_argument('-rg', '--rgen', type=int, default=None, help="Number of generations left to evovle")
+    parser.add_argument('-r', '--resume', action="store_true", help="Resume optimisation using CSV-file")
+    parser.add_argument('-rg', '--rgen', type=int, default=None, help="Number of generations already evolved")
+    parser.add_argument('-re', '--repoch', type=int, default=1, help="Epoch number of resumption")
 
 
     args = parser.parse_args()
 
-    if(args.resume == None):
+    if(not args.resume):
         # Start sweetspot search
         sweetspot_search(args.codec, args.ratecontrol, args.moga)
     else:
-        if(args.rstart == None and
-           args.rend == None and
-           args.rgen == None and
+        if(args.rgen == None and
            args.moga == None and
+           args.ratecontrol == None and
            args.codec == None):
-            logger.error("Resumption of optimisation requires -rs and -re to be set with the start and end index for generation to resume")
+            logger.error("Resumption of optimisation requires moga, codec, ratecontrol and rgen to be set")
             exit(1)
-        resume_optimisation(args.codec, args.moga, [args.resume, args.rstart, args.rend, args.rgen])
+        resume_optimisation(args.codec, args.ratecontrol, args.moga, args.rgen, args.repoch)

@@ -8,6 +8,7 @@ Constants are all caps, variables are all lower case.
 '''
 
 LOG_PATH = "/output/logs/"
+POPULATION_PICKLE_PATH = "/output/population.p"
 CLI_VERBOSITY = "INFO"  # ERROR, WARNING, INFO, DEBUG
 
 # gen-alg parameters

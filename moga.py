@@ -49,15 +49,22 @@ def uniform_init(prob, pop):
     # Create uniform decision vectors
     decision_vectors = []
     for param in range(0, len(low_bounds)):
-        stepsize = (high_bounds[param]-low_bounds[param]) / cfg.POP_SIZE
+        hb = high_bounds[param]
+        lb = low_bounds[param]
+        if cfg.opt_type[param] != "f":
+            hb += 0.4999
+            lb -= 0.4999
+        stepsize = (hb-lb) / (cfg.POP_SIZE-1)
+        
         param_vals = []
         for i in range(0, cfg.POP_SIZE):
-            param_vals.append(low_bounds[param] + stepsize*i)
+            param_vals.append(lb + stepsize*i)
         random.shuffle(param_vals)
 
         # Round param values if paramtype isnt float
         if cfg.opt_type[param] != "f":
             param_vals = np.around(param_vals, decimals=0)
+            param_vals = [0 if val == 0 else val for val in param_vals] # Remove negative zeroes
         decision_vectors.append(param_vals)
 
     decision_vectors = np.transpose(decision_vectors)

@@ -1,8 +1,8 @@
 {
     "CBR":{
         "bounds":{
-            "b:v": [0.5, 50, "f"],
-            "rc_mode": [0,2, "c"],
+            "b:v": [1, 50, "f"],
+            "rc_mode": [0, 1, "c"],
             "coder": [0, 1, "c"],
             "compression_level": [1 , 5, "i"],
             "g": [50, 1000, "i"],
@@ -14,7 +14,7 @@
             "b_depth": [1, 5, "i"]
         },
         "categorical":{
-            "rc_mode": ["CBR", "VBR", "AVBR"],
+            "rc_mode": ["CBR", "VBR"],
             "coder": ["ac", "vlc"]
         },
         "constants":{
@@ -23,7 +23,6 @@
     },
     "CQP":{
         "bounds":{
-            "rc_mode": [0, 1, "c"],
             "coder": [0, 1, "c"],
             "qp": [1, 40, "i"],
             "compression_level": [1 , 5, "i"],
@@ -34,10 +33,10 @@
             "b_depth": [1, 5, "i"]
         },
         "categorical":{
-            "rc_mode": ["CQP", "ICQ"],
             "coder": ["ac", "vlc"]
         },
         "constants":{
+            "rc_mode": "CQP",
             "pix_fmt": "nv12"
         }
     }

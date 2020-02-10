@@ -118,7 +118,7 @@ def sweetspot_search(codec_arg, rate_control_arg, moga_arg):
 
                     # Evolve pop using opt_alg
                     logger.debug("Starting evolution process")
-                    for gen in range(1, cfg.NO_GENERATIONS):
+                    for gen in range(0, cfg.NO_GENERATIONS):
                         logger.info("Generation: " + str(gen+1))
                         pop = opt_alg.evolve(pop)
                         pickle.dump( pop, open( cfg.POPULATION_PICKLE_PATH, "wb" ) )                    

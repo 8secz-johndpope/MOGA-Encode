@@ -1,9 +1,9 @@
 {
-    "CBR":{
+    "ABR":{
         "bounds":{
             "b:v": [2, 50, "f"],
             "aq-strength": [0.1, 1.9, "f"],
-            "preset": [0, 6, "c"],
+            "preset": [0, 7, "c"],
             "ctu": [0, 1, "c"],
             "min-cu-size": [0, 1, "c"],
             "pass": [0, 1, "c"],
@@ -16,8 +16,8 @@
             "g": [50, 1000, "i"],
             "keyint_min": [10, 40, "i"],
             "refs": [1, 16, "i"],
-            "qmin": [5, 14, "i"],
-            "qmax": [15, 51, "i"],
+            "qmin": [0, 19, "i"],
+            "qmax": [20, 69, "i"],
             "qdiff": [1, 8, "i"],
             "weightb": [0, 1, "i"],
             "intra-refresh": [0, 1, "i"],
@@ -31,7 +31,7 @@
             "tune": ["none", "psnr", "ssim", "grain"],
             "ctu": ["64", "32"],
             "min-cu-size": ["16", "8"],
-            "preset": ["veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"],
+            "preset": ["veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow", "placebo"],
             "pass": ["1", "2"],
             "me": ["dia", "hex", "umh", "esa", "tesa"],
             "aq-mode": ["none", "variance", "autovariance"],

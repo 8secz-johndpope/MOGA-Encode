@@ -27,9 +27,9 @@ ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
 VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265"]
 RATE_CONTROLS = { "h264_nvenc": ["CBR"],
                  "hevc_nvenc": ["CBR"],
-                 "libx264":    ["CBR"],
-                 "libx264rgb": ["CBR", "CRF"],
-                 "libx265":    ["CBR"],
+                 "libx264":    ["ABR"],
+                 "libx264rgb": ["ABR"],
+                 "libx265":    ["ABR"],
                  "h264_vaapi": ["CBR"],
                  "hevc_vaapi": ["CBR"],
                  "vp9_vaapi": ["CBR"],

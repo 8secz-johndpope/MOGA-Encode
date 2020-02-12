@@ -61,18 +61,24 @@ def get_libx264_args(input_args, output_args, x):
 
     # Constant bitrate with constrained encoding
     if 'b:v' in output_args: 
-        output_args["maxrate"] = output_args['b:v']
-
-        try:
-            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
-            del output_args["bufratio"]
-        except Exception:
-            logger.critical("Could not set buffer size, quitting...")
-            exit(1)
-
         # Checks if one or two passes are to be done
-        if output_args["pass"]=="2": is_two_pass = True
+        if output_args["pass"]=="2":
+            is_two_pass = True
+        else:
+            output_args["maxrate"] = output_args['b:v']
+
+            try:
+                output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
+            except Exception:
+                logger.critical("Could not set buffer size, quitting...")
+                exit(1)
+
         del output_args["pass"]
+        del output_args["bufratio"]
+
+
+
+        
 
     if cfg.rate_control != "Near-LL":
         # Adjust parameters according to compatability

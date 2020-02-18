@@ -92,24 +92,25 @@ def sweetspot_search(codec_arg, rate_control_arg, moga_arg):
     # Evaluate each codec in VIDEO_ENCODERS list
     for codec in cfg.VIDEO_ENCODERS:
 
-        for rate_control in cfg.RATE_CONTROLS[codec]:
-            # Load parameters for codec
-            cfg.load_params_from_json(codec, rate_control)
-            logger.info("Optimising " + codec + " using " + rate_control + "...")
+        for epoch in range(1, cfg.EPOCHS+1):
 
-            for epoch in range(1, cfg.EPOCHS+1):
+            for rate_control in cfg.RATE_CONTROLS[codec]:
+                # Load parameters for codec
+                cfg.load_params_from_json(codec, rate_control)
+                #logger.info("Optimising " + codec + " using " + rate_control + "...")
 
                 for alg in cfg.MOG_ALGS:
                     cfg.epoch = epoch
                     cfg.mog_alg = alg
-                    logger.info("----------- EPOCH: " + str(epoch) + " Alg: " + alg + " ------------")
+                    logger.info("----------- EPOCH: " + str(epoch) + " Alg: " + alg +
+                                " Codec: " + str(codec) +":"+str(rate_control)+" ------------")
 
                     # Get optimization problem and algorithm
                     opt_prob = pyg.problem(sweetspot_problem())
 
                     # Initiate population
                     rand_seed = epoch*3+1  # An arbitrary but repeatable randomisation seed
-                    # random.seed(rand_seed)
+                    random.seed(rand_seed)
                     pop = pyg.population(prob=opt_prob, seed=rand_seed)
                     pop = uniform_init(opt_prob, pop)
 
@@ -201,7 +202,7 @@ if(__name__ == "__main__"):
     parser.add_argument('-a', '--moga', default=None, help="Evaluate using specific ML-algorithm")
     parser.add_argument('-c', '--codec', default=None, help="Evaluate a specific codec")
     parser.add_argument('-rc', '--ratecontrol', default=None, help="Evaluate a specific rate control")
-    parser.add_argument('-r', '--resume', action="store_true", help="Resume optimisation using CSV-file")
+    parser.add_argument('-r', '--resume', action="store_true", help="Resume optimisation using pickle-file")
     parser.add_argument('-rg', '--rgen', type=int, default=None, help="Number of generations already evolved")
     parser.add_argument('-re', '--repoch', type=int, default=1, help="Epoch number of resumption")
 

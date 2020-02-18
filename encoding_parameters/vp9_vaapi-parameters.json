@@ -3,7 +3,7 @@
         "bounds":{
             "b:v": [1, 50, "f"],
             "rc_mode": [0, 1, "c"],
-            "compression_level": [1 , 5, "i"],
+            "compression_level": [0 , 2, "c"],
             "g": [50, 1000, "i"],
             "sc_threshold": [0, 60, "i"],
             "bf": [1, 16, "i"],
@@ -13,7 +13,8 @@
             "b_depth": [1, 5, "i"]
         },
         "categorical":{
-            "rc_mode": ["CBR", "VBR"]
+            "rc_mode": ["CBR", "VBR", "AVBR"],
+            "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
             "pix_fmt": "nv12"
@@ -22,7 +23,8 @@
     "CQP":{
         "bounds":{
             "qp": [1, 40, "i"],
-            "compression_level": [1 , 5, "i"],
+            "rc_mode": [0 , 1, "c"],
+            "compression_level": [0 , 2, "c"],
             "g": [50, 1000, "i"],
             "sc_threshold": [0, 60, "i"],
             "bf": [1, 16, "i"],
@@ -30,9 +32,10 @@
             "b_depth": [1, 5, "i"]
         },
         "categorical":{
+            "rc_mode": ["CQP", "ICQ"],
+            "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
-            "rc_mode": "CQP",
             "pix_fmt": "nv12"
         }
     }

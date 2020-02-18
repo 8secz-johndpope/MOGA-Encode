@@ -7,7 +7,7 @@
             "ctu": [0, 1, "c"],
             "min-cu-size": [0, 1, "c"],
             "pass": [0, 1, "c"],
-            "tune": [0, 3, "c"], 
+            "tune": [0, 4, "c"], 
             "me": [0, 4, "c"],
             "aq-mode":  [0, 2, "c"],
             "weightp":  [0, 2, "c"],
@@ -28,7 +28,7 @@
             "bframe-bias": [-90, 100, "i"]
         },
         "categorical":{
-            "tune": ["none", "psnr", "ssim", "grain"],
+            "tune": ["none", "psnr", "ssim", "grain", "animation"],
             "ctu": ["64", "32"],
             "min-cu-size": ["16", "8"],
             "preset": ["veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow", "placebo"],

@@ -35,6 +35,7 @@ def img_to_vid(images_dir, decision_vector):
         except ffmpeg.Error as ex:
             logger.critical("FFMPEG: error converting images to video")
             logger.critical(ex.stderr.decode('utf8'))
+            logger.critical(output_args)
             exit(1)
 
     try:
@@ -49,6 +50,7 @@ def img_to_vid(images_dir, decision_vector):
     except ffmpeg.Error as ex:
         logger.critical("FFMPEG: error converting images to video")
         logger.critical(ex.stderr.decode('utf8'))
+        logger.critical(output_args)
         exit(1)
     return True
 

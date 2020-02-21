@@ -47,7 +47,7 @@ def get_codec_args(decision_vector):
     elif(cfg.video_encoder == "libx264rgb" or cfg.video_encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
     elif(cfg.video_encoder == "libx265"): return get_libx265_args(input_args, output_args, decision_vector)
     elif(cfg.video_encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "hevc_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "hevc_vaapi"): return get_hevc_vaapi_args(input_args, output_args, decision_vector)
     elif(cfg.video_encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
     elif(cfg.video_encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, decision_vector)
     elif(cfg.video_encoder == "libaom-av1"): return get_libaomav1_args(input_args, output_args, decision_vector)
@@ -61,18 +61,24 @@ def get_libx264_args(input_args, output_args, x):
 
     # Constant bitrate with constrained encoding
     if 'b:v' in output_args: 
-        output_args["maxrate"] = output_args['b:v']
-
-        try:
-            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
-            del output_args["bufratio"]
-        except Exception:
-            logger.critical("Could not set buffer size, quitting...")
-            exit(1)
-
         # Checks if one or two passes are to be done
-        if output_args["pass"]=="2": is_two_pass = True
+        if output_args["pass"]=="2":
+            is_two_pass = True
+        else:
+            output_args["maxrate"] = output_args['b:v']
+
+            try:
+                output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
+            except Exception:
+                logger.critical("Could not set buffer size, quitting...")
+                exit(1)
+
         del output_args["pass"]
+        del output_args["bufratio"]
+
+
+
+        
 
     if cfg.rate_control != "Near-LL":
         # Adjust parameters according to compatability
@@ -169,6 +175,12 @@ def get_hevc_vaapi_args(input_args, output_args, x):
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
+    if output_args["rc_mode"] == "CBR":
+        output_args["maxrate"] = output_args ["b:v"]
+    #if output_args["rc_mode"] == "ICQ":
+    #    output_args["q"] = output_args["qp"]
+    #    del output_args["qp"]
+        
     return input_args, output_args, False
 
 
@@ -180,17 +192,17 @@ def get_vp9_vaapi_args(input_args, output_args, x):
 
 
 def get_libvpxvp9_args(input_args, output_args, x):
-    if 'b:v' in output_args: 
+    is_two_pass = False
+    if output_args['b:v'] != "0M": 
         try:
             output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
             del output_args["bufratio"]
         except Exception:
             logger.critical("Could not set buffer size, quitting...")
             exit(1)
-
-    # Checks if one or two passes are to be done
-    is_two_pass = True if output_args["pass"]=="2" else False
-    del output_args["pass"]
+        # Checks if one or two passes are to be done
+        if output_args["pass"]=="2": is_two_pass = True
+        del output_args["pass"]
     return input_args, output_args, is_two_pass
 
 

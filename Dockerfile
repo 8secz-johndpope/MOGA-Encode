@@ -509,7 +509,7 @@ COPY --from=build /usr/local/lib /usr/local/lib/
 
 RUN \
 	apt-get update -y && \
-	apt-get install -y --no-install-recommends libva-drm2 libva2 i965-va-driver
+	apt-get install -y --no-install-recommends libva-drm2 libva2 i965-va-driver vainfo
 
 
 

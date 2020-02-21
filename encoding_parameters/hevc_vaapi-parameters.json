@@ -17,7 +17,7 @@
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
-            "pix_fmt": "nv12"
+            "pix_fmt": "yuv444p"
         }
     },
     "CQP":{
@@ -36,7 +36,7 @@
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
-            "pix_fmt": "nv12"
+            "pix_fmt": "yuv444p"
         }
     }
 }

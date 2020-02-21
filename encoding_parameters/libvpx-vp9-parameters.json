@@ -10,7 +10,7 @@
             "aq-mode": [0, 4, "i"],
             "qmin": [6, 14, "i"],
             "qmax": [25, 50, "i"],
-            "g": [50, 1000, "i"],
+            "g": [50, 500, "i"],
             "rc-lookahead": [20, 60, "i"],
             "sharpness": [0, 7, "i"],
             "keyint_min": [10, 40, "i"]
@@ -20,6 +20,29 @@
             "pass": ["1", "2"]
         },
         "constants":{
+            "pix_fmt": "yuv444p",
+            "row-mt": "1",
+            "tiles": "2x2",
+            "threads": 16
+        }
+    },
+    "CRF":{
+        "bounds":{
+            "deadline": [0, 2, "c"],
+            "crf": [1, 40, "i"],
+            "tune-content": [0, 2, "i"],
+            "speed": [0, 5, "i"],
+            "aq-mode": [0, 4, "i"],
+            "g": [50, 500, "i"],
+            "rc-lookahead": [20, 60, "i"],
+            "sharpness": [0, 7, "i"],
+            "keyint_min": [10, 40, "i"]
+        },
+        "categorical":{
+            "deadline": ["realtime", "good", "best"]
+        },
+        "constants":{
+            "b:v": 0,
             "pix_fmt": "yuv444p",
             "row-mt": "1",
             "tiles": "2x2"

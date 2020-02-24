@@ -1,6 +1,6 @@
 # By: Oscar Andersson 2019
 
-import os, logging, ffmpeg
+import os, logging, ffmpeg, time
 import numpy as np
 from encoding_arguments import get_codec_args
 import config as cfg
@@ -36,7 +36,7 @@ def img_to_vid(images_dir, decision_vector):
             logger.critical("FFMPEG: error converting images to video")
             logger.critical(ex.stderr.decode('utf8'))
             logger.critical(output_args)
-            exit(1)
+            return False
 
     try:
         if cfg.video_encoder == "libaom-av1" : output_args["cpu-used"] = "0"
@@ -51,7 +51,7 @@ def img_to_vid(images_dir, decision_vector):
         logger.critical("FFMPEG: error converting images to video")
         logger.critical(ex.stderr.decode('utf8'))
         logger.critical(output_args)
-        exit(1)
+        return False
     return True
 
 
@@ -75,7 +75,8 @@ def vid_to_img(images_dir):
     except ffmpeg.Error as ex:
         logger.critical("FFMPEG: error converting video to images")
         logger.critical(ex.stderr.decode('utf8'))
-        exit(1)
+        return False
+    return True
 
 
 def transcode(img_path, output_dir, decision_vector):
@@ -90,8 +91,25 @@ def transcode(img_path, output_dir, decision_vector):
 
     filenames = get_names(img_path)
 
-    img_to_vid(img_path, decision_vector)
-    vid_to_img(output_dir)
+    tries1, tries2 = 0, 0
+    while(True):
+        if(img_to_vid(img_path, decision_vector)): break
+        elif(tries1 < 3):
+            logger.critical("Retrying img to vid conversion")
+            tries1 += 1
+            time.sleep(240) # Give time for the failed ffmpeg process to terminate
+        else:
+            logger.critical("Transcode failed, exiting...")
+            exit(1)
+    while(True):
+        if(vid_to_img(output_dir)): break
+        elif(tries2 < 3):
+            logger.critical("Retrying vid to img conversion")
+            tries2 += 1
+            time.sleep(240) # Give time for the failed ffmpeg process to terminate
+        else:
+            logger.critical("Transcode failed, exiting...")
+            exit(1)
 
     vid_size = os.path.getsize(cfg.TEMP_STORAGE_PATH)
 

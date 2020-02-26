@@ -6,14 +6,13 @@
             "compression_level": [0 , 2, "c"],
             "g": [50, 1000, "i"],
             "sc_threshold": [0, 60, "i"],
-            "bf": [1, 16, "i"],
+            "bf": [0, 16, "i"],
             "refs": [1, 16, "i"],
             "qmin": [0, 14, "i"],
-            "qmax": [15, 69, "i"],
-            "b_depth": [1, 5, "i"]
+            "qmax": [15, 69, "i"]
         },
         "categorical":{
-            "rc_mode": ["CBR", "VBR", "QVBR"],
+            "rc_mode": ["CBR", "VBR"],
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
@@ -24,20 +23,18 @@
     "CQP":{
         "bounds":{
             "qp": [1, 40, "i"],
-            "rc_mode": [0 , 1, "c"],
             "compression_level": [0 , 2, "c"],
             "g": [50, 1000, "i"],
             "sc_threshold": [0, 60, "i"],
-            "bf": [1, 16, "i"],
-            "refs": [1, 16, "i"],
-            "b_depth": [1, 5, "i"]
+            "bf": [0, 16, "i"],
+            "refs": [1, 16, "i"]
         },
         "categorical":{
-            "rc_mode": ["CQP", "ICQ"],
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
             "pix_fmt": "yuv444p",
+            "rc_mode": "CQP",
             "bsf:v": "vp9_raw_reorder,vp9_superframe"
         }
     }

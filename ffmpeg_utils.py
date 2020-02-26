@@ -143,9 +143,12 @@ def set_names(filenames, img_path):
     Rename the files in img_path to filenames in filenames
     '''
     generated_names = get_names(img_path) # Getting names of new images
+    framediff = len(generated_names) - len(filenames)
+    if(framediff != 0): logger.critical("FRAMECOUNT MISSMATCH of "+str(framediff)+" frames: "+str(img_path))
+
     i = 0
     try:
-        for i in range(len(generated_names)):  # index 0 -> len(generated_names)-1
+        for i in range(len(filenames)):  # index 0 -> len(generated_names)-1
             os.rename( os.path.join(img_path, generated_names[i]) , os.path.join(img_path, filenames[i]) )
     except Exception as ex:
         logger.critical(ex)

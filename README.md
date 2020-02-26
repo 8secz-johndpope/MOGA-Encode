@@ -21,6 +21,9 @@ Docker CE, Docker-compose and nvidia-container-runtime
 - wait 10 seconds
 - run: docker-compose run -d moga-encode
 
+**NOTE!**
+
+To properly run VAAPI encoding, verify that i965 is used!! (export LIBVA_DRIVER_NAME=i965 otherwise) 
 
 #### Debugging
 

@@ -17,7 +17,8 @@
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
-            "pix_fmt": "yuv444p"
+            "pix_fmt": "yuv444p",
+            "bsf:v": "vp9_raw_reorder,vp9_superframe"
         }
     },
     "CQP":{
@@ -36,7 +37,8 @@
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
-            "pix_fmt": "yuv444p"
+            "pix_fmt": "yuv444p",
+            "bsf:v": "vp9_raw_reorder,vp9_superframe"
         }
     }
 }

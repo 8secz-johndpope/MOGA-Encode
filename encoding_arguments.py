@@ -177,9 +177,6 @@ def get_hevc_vaapi_args(input_args, output_args, x):
     output_args["vf"] = "format=nv12|vaapi,hwupload"
     if output_args["rc_mode"] == "CBR":
         output_args["maxrate"] = output_args ["b:v"]
-    #if output_args["rc_mode"] == "ICQ":
-    #    output_args["q"] = output_args["qp"]
-    #    del output_args["qp"]
         
     return input_args, output_args, False
 
@@ -188,6 +185,8 @@ def get_vp9_vaapi_args(input_args, output_args, x):
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
+    if output_args["rc_mode"] == "CBR":
+        output_args["maxrate"] = output_args ["b:v"]
     return input_args, output_args, False
 
 

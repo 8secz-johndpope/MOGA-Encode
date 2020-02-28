@@ -2,6 +2,7 @@
     "CBR":{
         "bounds":{
             "b:v": [1, 50, "f"],
+            "bufratio": [0.25, 4, "f"],
             "rc_mode": [0, 1, "c"],
             "compression_level": [0 , 2, "c"],
             "g": [50, 1000, "i"],
@@ -9,7 +10,9 @@
             "bf": [0, 16, "i"],
             "refs": [1, 16, "i"],
             "qmin": [0, 14, "i"],
-            "qmax": [15, 69, "i"]
+            "qmax": [15, 69, "i"],
+            "loop_filter_level": [0, 63, "i"],
+            "loop_filter_sharpness": [0, 15, "i"]
         },
         "categorical":{
             "rc_mode": ["CBR", "VBR"],
@@ -27,7 +30,9 @@
             "g": [50, 1000, "i"],
             "sc_threshold": [0, 60, "i"],
             "bf": [0, 16, "i"],
-            "refs": [1, 16, "i"]
+            "refs": [1, 16, "i"],
+            "loop_filter_level": [0, 63, "i"],
+            "loop_filter_sharpness": [0, 15, "i"]
         },
         "categorical":{
             "compression_level": ["1" ,"4" ,"7"]

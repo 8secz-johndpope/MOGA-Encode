@@ -168,6 +168,15 @@ def get_h264_vaapi_args(input_args, output_args, x):
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
+    if 'b:v' in output_args: 
+        if output_args["rc_mode"] == "CBR":
+            output_args["maxrate"] = output_args ["b:v"]
+        try:
+            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
+        except Exception:
+            logger.critical("Could not set buffer size, quitting...")
+            exit(1)
+        del output_args["bufratio"]
     return input_args, output_args, False
 
 
@@ -175,8 +184,15 @@ def get_hevc_vaapi_args(input_args, output_args, x):
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
-    if output_args["rc_mode"] == "CBR":
-        output_args["maxrate"] = output_args ["b:v"]
+    if 'b:v' in output_args: 
+        if output_args["rc_mode"] == "CBR":
+            output_args["maxrate"] = output_args ["b:v"]
+        try:
+            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
+        except Exception:
+            logger.critical("Could not set buffer size, quitting...")
+            exit(1)
+        del output_args["bufratio"]
         
     return input_args, output_args, False
 
@@ -185,8 +201,15 @@ def get_vp9_vaapi_args(input_args, output_args, x):
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
-    if output_args["rc_mode"] == "CBR":
-        output_args["maxrate"] = output_args ["b:v"]
+    if 'b:v' in output_args: 
+        if output_args["rc_mode"] == "CBR":
+            output_args["maxrate"] = output_args ["b:v"]
+        try:
+            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
+        except Exception:
+            logger.critical("Could not set buffer size, quitting...")
+            exit(1)
+        del output_args["bufratio"]
     return input_args, output_args, False
 
 

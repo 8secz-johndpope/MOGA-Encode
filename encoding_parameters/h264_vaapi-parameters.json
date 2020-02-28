@@ -2,6 +2,7 @@
     "CBR":{
         "bounds":{
             "b:v": [1, 50, "f"],
+            "bufratio": [0.25, 4, "f"],
             "rc_mode": [0, 1, "c"],
             "coder": [0, 1, "c"],
             "compression_level": [0 , 2, "c"],

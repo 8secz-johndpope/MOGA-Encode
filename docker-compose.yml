@@ -43,4 +43,22 @@ services:
         tty: true
         command: python tools/rest_communication.py
 
+    gscnn:
+        container_name: gscnn
+        build:
+            context: ../GSCNN
+            dockerfile: Dockerfile
+        image: oscar/gscnn
+        network_mode: "host"
+        ipc: "host"
+        volumes:
+        - ../GSCNN-mldata:/data
+        - ../GSCNN:/mll
+        runtime: nvidia
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=all
+        working_dir: /ml
+        stdin_open: true
+        tty: true
+
 

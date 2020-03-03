@@ -87,7 +87,7 @@ def eval_mask_boundary(seg_mask,gt_mask,num_classes,num_proc=10,bound_th=0.008):
         Fc[class_id] = np.sum(_valid)
         Fs[np.isnan(Fs)] = 0
         Fpc[class_id] = sum(Fs)
-    p.terminate()
+    #p.terminate()
     return Fpc, Fc
 
 

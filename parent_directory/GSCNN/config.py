@@ -62,7 +62,7 @@ __C.REDUCE_BORDER_EPOCH= -1
 __C.STRICTBORDERCLASS= None
 
 __C.DATASET =AttrDict()
-__C.DATASET.CITYSCAPES_DIR='/data/cityscapes'
+__C.DATASET.CITYSCAPES_DIR='/data/GSCNN-mldata/cityscapes'
 __C.DATASET.CV_SPLITS=3
 
 __C.MODEL = AttrDict()

@@ -53,7 +53,7 @@ parser.add_argument('--att_weight', type=float, default=1.0,
 parser.add_argument('--dual_weight', type=float, default=1.0,
                     help='Dual loss weight for joint loss')
 
-parser.add_argument('--evaluate', action='store_true', default=False)
+parser.add_argument('--evaluate', action='store_true', default=True)
 
 parser.add_argument("--local_rank", default=0, type=int)
 
@@ -125,8 +125,9 @@ if 'WORLD_SIZE' in os.environ:
 assert_and_infer_cfg(args)
 writer = prep_experiment(args,parser)
 
-
 default_eval_epoch = 1
+
+
 def main(eval_args=None):
     '''
     Main Function
@@ -134,9 +135,13 @@ def main(eval_args=None):
     '''
     # Parse arguments from rest_communication.py
     #args = parser.parse_args(eval_args)
+    if args.snapshot == None:
+        args.snapshot = "checkpoints/best_cityscapes_checkpoint.pth"
+    
     train_loader, val_loader, train_obj = datasets.setup_loaders(args)
     criterion, criterion_val = loss.get_loss(args)
     net = network.get_net(args, criterion)
+    net = restore_snapshot(net)
     torch.cuda.empty_cache()
 
     return evaluate(val_loader, net)
@@ -199,20 +204,48 @@ def evaluate(val_loader, net):
     freq = IOU_acc.sum(axis=1) / IOU_acc.sum()
     mean_iu = np.nanmean(iu)
     fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
-    print(mean_iu)
-    print(acc)
-    print(acc_cls)
-    print(fwavacc)
-
 
     #logging.info('F_Score: ' + str(np.sum(Fpc/Fc)/args.dataset_cls.num_classes))
     #logging.info('F_Score (Classwise): ' + str(Fpc/Fc))
+    results ={
+        "mean_iu": mean_iu,
+        "acc": acc,
+        "acc_cls": acc_cls,
+        "fwavacc": fwavacc
+    } 
 
-    return mean_iu, acc, acc_cls, fwavacc
+    return results
+
+
+def restore_snapshot(net):
+    checkpoint = torch.load(args.snapshot, map_location=torch.device('cpu'))
+    logging.info("Load Compelete")
+    if 'state_dict' in checkpoint:
+        net = forgiving_state_restore(net, checkpoint['state_dict'])
+    else:
+        net = forgiving_state_restore(net, checkpoint)
+    return net
+
+
+def forgiving_state_restore(net, loaded_dict):
+    # Handle partial loading when some tensors don't match up in size.
+    # Because we want to use models that were trained off a different
+    # number of classes.
+    net_state_dict = net.state_dict()
+    new_loaded_dict = {}
+    for k in net_state_dict:
+        if k in loaded_dict and net_state_dict[k].size() == loaded_dict[k].size():
+            new_loaded_dict[k] = loaded_dict[k]
+        else:
+            logging.info('Skipped loading parameter {}'.format(k))
+    net_state_dict.update(new_loaded_dict)
+    net.load_state_dict(net_state_dict)
+    return net
 
 
 if __name__ == '__main__':
-    main()
+    results = main()
+    print(str(results))
 
 
 

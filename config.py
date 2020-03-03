@@ -7,8 +7,10 @@ Contains constants and "static" variables which most modules use/share.
 Constants are all caps, variables are all lower case.
 '''
 
-LOG_PATH = "/output/logs/"
-POPULATION_PICKLE_PATH = "/output/population.p"
+OUTPUT_BASE = "/output"
+# OUTPUT_BASE = "/home/pine/Documents/ML/output"
+LOG_PATH = OUTPUT_BASE + "/logs/"
+POPULATION_PICKLE_PATH = OUTPUT_BASE + "/population.p"
 CLI_VERBOSITY = "INFO"  # ERROR, WARNING, INFO, DEBUG
 
 # gen-alg parameters
@@ -16,27 +18,33 @@ POP_SIZE = 4 * 4    # must be a multiple of 4 and larger than 5!
 NO_GENERATIONS = 10
 MOG_ALGS = ["nsga2"]   # nsga2, nspso, moead
 EPOCHS = 1
-PLOT_PATH = "/output/results/"
-FITNESS_DATA_PATH = "/output/results/"
-ML_PERFORMANCE_BASELINE = 0.8162191842797382
-ML_PERFORMANCE_MEASURE = "mean_IoU"
+PLOT_PATH = OUTPUT_BASE + "/results/"
+FITNESS_DATA_PATH = OUTPUT_BASE + "/results/"
 
+#ML_PERFORMANCE_BASELINE = 0.8162191842797382
+ML_PERFORMANCE_BASELINE = 1.00
+#ML_PERFORMANCE_MEASURE = "mean_IoU"
+ML_PERFORMANCE_MEASURE = "mean_iu"
+
+ML_DATA_BASE = "/data"
 # optimization_problem parameters
-ML_DATA_INPUT = "/data/untouched_full/"
-ML_DATA_OUTPUT = "/data/cityscapes/leftImg8bit/val/"
-VIDEO_ENCODERS = ["h264_nvenc", "hevc_nvenc", "libx264", "libx265"]
+ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/untouched_small/"
+#ML_DATA_OUTPUT = ML_DATA_BASE + "/HRNet-mldata/cityscapes/leftImg8bit/val/"
+ML_DATA_OUTPUT = ML_DATA_BASE + "/GSCNN-mldata/cityscapes/leftImg8bit_trainvaltest/leftImg8bit/val/"
+VIDEO_ENCODERS = ["hevc_nvenc"]
 RATE_CONTROLS = { "h264_nvenc": ["CBR"],
                  "hevc_nvenc": ["CBR"],
                  "libx264":    ["ABR"],
                  "libx264rgb": ["ABR"],
                  "libx265":    ["ABR"],
                  "h264_vaapi": ["CBR"],
-                 "hevc_vaapi": ["CBR"],
+                 "hevc_vaapi": ["CQP"],
                  "vp9_vaapi": ["CBR"],
                  "libvpx-vp9": ["CBR"],
-                 "libaom-av1": ["CBR"]  }
+                 "libaom-av1": ["CBR"] }
 
 # ffmpeg_utils parameters
+#TEMP_STORAGE_PATH = "/home/pine/Documents/ML/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
 TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
 IMAGE_TYPE = "png"
 NAMING_SCHEME =  '%06d'  # imgtype=png & scheme='%d' --> 1.png, 2.png, 3.png...

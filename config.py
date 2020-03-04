@@ -110,12 +110,3 @@ def load_params_from_json(encoder, r_control):
         if param_bounds[param][2] == "f": no_continous+=1
     logger.debug("Params loaded: " + str(opt_params))
 
-
-
-# Testing degrading quality with constant parameters
-ENCODER_DICT = ["libx264", "hevc_nvenc", "libvpx-vp9"]
-SWEETSPOT_PARAMS = {
-    "libx264": [2,2,2,1],
-    "hevc_nvenc": [1,1],
-    "libvpx-vp9": [2,2,2]
-}

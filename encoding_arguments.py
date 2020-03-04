@@ -154,6 +154,10 @@ def get_h264_nvenc_args(input_args, output_args, x):
     # Add hardware decoding flag
     input_args["hwaccel"] = "nvdec"
     # NVENC handles two-pass internally, hence returning False
+
+    # Handle incompatible parameter combination
+    if output_args["b_ref_mode"] == "2": output_args["weighted_pred"] = 0
+    
     return input_args, output_args, False
 
 

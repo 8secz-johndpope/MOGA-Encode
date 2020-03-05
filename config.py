@@ -22,16 +22,16 @@ PLOT_PATH = OUTPUT_BASE + "/results/"
 FITNESS_DATA_PATH = OUTPUT_BASE + "/results/"
 
 #ML_PERFORMANCE_BASELINE = 0.8162191842797382
-ML_PERFORMANCE_BASELINE = 1.00
+ML_PERFORMANCE_BASELINE = 0.806058279492062
 #ML_PERFORMANCE_MEASURE = "mean_IoU"
 ML_PERFORMANCE_MEASURE = "mean_iu"
 
 ML_DATA_BASE = "/data"
 # optimization_problem parameters
-ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/untouched_small/"
+ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/untouched_gscnn_seq/"
 #ML_DATA_OUTPUT = ML_DATA_BASE + "/HRNet-mldata/cityscapes/leftImg8bit/val/"
 ML_DATA_OUTPUT = ML_DATA_BASE + "/GSCNN-mldata/cityscapes/leftImg8bit_trainvaltest/leftImg8bit/val/"
-VIDEO_ENCODERS = ["hevc_nvenc"]
+VIDEO_ENCODERS = ["libx264, hevc_nvenc, h264_nvenc"]
 RATE_CONTROLS = { "h264_nvenc": ["CBR"],
                  "hevc_nvenc": ["CBR"],
                  "libx264":    ["ABR"],

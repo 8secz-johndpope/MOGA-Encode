@@ -1,6 +1,5 @@
 
 # Ignore some files and archives
-*.7z
 *.mbtree
 *.log
 

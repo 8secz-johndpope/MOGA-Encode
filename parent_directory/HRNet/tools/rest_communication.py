@@ -1,6 +1,6 @@
 # By: Oscar Andersson 2019
 
-from flask import Flask, abort
+from flask import Flask, abort, request
 import json
 from test import main as run_eval
 import sys
@@ -28,9 +28,7 @@ command_args = []
 command_args.append("--cfg")
 command_args.append("experiments/cityscapes/seg_hrnet_ocr_w48_train_oscar.yaml")
 command_args.append("DATASET.ROOT")
-command_args.append("/data/")
-command_args.append("DATASET.TEST_SET")
-command_args.append("list/cityscapes/val.lst")
+command_args.append("/data/HRNet-mldata/")
 command_args.append("TEST.MODEL_FILE")
 command_args.append("models/hrnet_ocr_cs_8162_torch11.pth")
 
@@ -42,7 +40,15 @@ def get_eval_results():
 
     last_request = time.time()
     eval_calls += 1
-    eval_results = run_eval(command_args)
+    eval_list = request.args.get('eval_list')
+    command = command_args
+    command.append("DATASET.TEST_SET")
+    if(eval_list != None):
+        command.append("list/cityscape_eval/"+ str(eval_list) +".lst")
+    else:
+        command.append("list/cityscapes/val.lst")
+    
+    eval_results = run_eval(command)
     
     try:
         res = app.response_class(

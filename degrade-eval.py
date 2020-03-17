@@ -69,7 +69,7 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
             scenario = scenario_results[key] 
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for param_set in scenario.keys():
-                data = [*scenario.values()]
+                data = scenario[param_set]
                 data = np.concatenate((param_set, data), axis=None)
                 data = np.concatenate((key, data), axis=None)
                 data_writer.writerow(data)

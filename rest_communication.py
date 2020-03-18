@@ -18,7 +18,6 @@ def get_eval_from_ml_alg(eval_list = None):
     -------
     ML-performance measurement
     '''
-    logger.info("Requesting evaluation from ML-algorithm...")
     payload = ""
     if(eval_list != None):
         payload = {"eval_list": eval_list}

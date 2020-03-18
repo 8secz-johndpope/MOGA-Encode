@@ -103,6 +103,7 @@ class sweetspot_problem:
         logger.info("Time for transcode: " + str(int(round(transcode_time)))+" seconds")
 
         # Retrieve fitness results
+        logger.info("Requesting evaluation from ML-algorithm...")
         score, full_response = rest_communication.get_eval_from_ml_alg()    # Get ML-algorithm results 
         comp_ratio = self.original_img_size/comp_size               # Calc compression-ratio
         logger.info("ML-performance: " + str(score) + "\nComp-ratio: " + str(comp_ratio))

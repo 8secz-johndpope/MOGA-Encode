@@ -524,4 +524,5 @@ RUN pip3 install numpy==1.18.1 \
                  scikit-image==0.16.2 \
                  matplotlib==3.1.3 \
                  ffmpeg-python==0.2.0 \
-                 requests==2.22.0
+                 requests==2.22.0 \
+                 tqdm==4.43.0

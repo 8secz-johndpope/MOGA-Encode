@@ -6,6 +6,7 @@ from skimage import io, metrics
 from multiprocessing import Pool
 import config as cfg
 import plotting as pl
+from tqdm import trange
 import random, logging, os, argparse, csv, re, json, shutil, time
 from datetime import datetime
 
@@ -35,19 +36,16 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
     param_sets = load_param_set(csvpath)
 
     # Iterate through each scenario and evaluate each set of coding parameters
-    scenario_results = {}
-    for scenario in scenarios:
-        logger.info("Evaluating scenario: " + str(scenario))
+    for i in trange(len(scenarios)):
 
+        scenario = scenarios[i]
         input_scenario_dir = cfg.ML_DATA_INPUT +"/"+ scenario
         output_scenario_dir = cfg.ML_DATA_OUTPUT +"/situation"
         original_scenario_size = ffmpeg_utils.get_directory_size(input_scenario_dir)
-
         results = {}
+
+        # Iterate through each set of coding parameters
         for param_set in param_sets:
-
-            logger.info("Evaluating parameter set: " + str(param_set))
-
             # Remove any earlier degraded scenarios
             shutil.rmtree(output_scenario_dir, ignore_errors=True)
 
@@ -62,16 +60,13 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
             comp_ratio = original_scenario_size/comp_size               # Calc compression-ratio
             results[decision_vector_to_string(param_set)] = [*full_response.values(), comp_ratio, *mean_comparison_results]
 
-        scenario_results[scenario] = results
-
-    for key in scenario_results.keys():
-        with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/'+ key + '-results.csv', mode='w') as data_file:
-            scenario = scenario_results[key] 
+        # Save scenario results to CSV-file
+        with open(cfg.FITNESS_DATA_PATH+cfg.timestamp+'/'+codec_arg+'_'+rate_control_arg+'_results.csv', mode='a') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            for param_set in scenario.keys():
-                data = scenario[param_set]
+            for param_set in results.keys():
+                data = results[param_set]
                 data = np.concatenate((param_set, data), axis=None)
-                data = np.concatenate((key, data), axis=None)
+                data = np.concatenate((scenario, data), axis=None)
                 data_writer.writerow(data)
 
 

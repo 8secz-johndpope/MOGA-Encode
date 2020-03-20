@@ -2,6 +2,7 @@
 
 # Imports
 import numpy as np
+import pygmo as pyg
 from skimage import io, metrics
 from multiprocessing import Pool
 import config as cfg
@@ -116,18 +117,43 @@ def decision_vector_to_string(d_vector):
     return string
 
 
+def string_to_decision_vector(x):
+    x = x.replace('\n', '').replace('[', '').replace(']', '').replace("'", "").replace('"', "")
+    x = re.sub('\s+', ',', x.strip())
+    x = x.split(",")
+    x = [elem for elem in x if elem != ""]  # Remove empty spaces
+    return x
+
+
 def load_param_set(csvpath):
     param_sets = []
     with open(csvpath) as csv_file:
         csv_data = csv.reader(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for row in csv_data:
-            x = str(row[0])
-            x = x.replace('\n', '').replace('[', '').replace(']', '')
-            x = re.sub('\s+', ',', x.strip())
-            param_sets.append(x.split(","))
-
+            param_sets.append(string_to_decision_vector(str(row[0])))
     return np.asfarray(param_sets,float)
 
+
+def non_ndf_conv(csvpath):
+    fitness = []
+    param_sets = []
+    ndf = []
+    param_index, perf_index, comp_index = 4, 6, 7
+    with open(csvpath) as csv_file:
+        csv_data = csv.reader(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+        for row in csv_data:
+            fitness.append( [float(row[perf_index]), float(row[comp_index])] )
+            param_sets.append(string_to_decision_vector(str(row[param_index])))
+        ndf = pyg.non_dominated_front_2d(fitness)
+
+        for i in range(len(param_sets), 0):
+            if (not i in ndf): del param_sets[i]
+
+    with open(csvpath + "_new.csv", mode='w') as data_file:
+        data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for ps in param_sets:
+            data_writer.writerow([ps])
 
 def convert_param_set(csvpath):
     eval_sets = []
@@ -188,12 +214,17 @@ if(__name__ == "__main__"):
     parser.add_argument('-c', '--codec', default=None, help="Codec of evaluation")
     parser.add_argument('-rc', '--ratecontrol', default=None, help="Rate control of evaluation")
     parser.add_argument('-f', '--csvfile', default=None, help="CSV-file with coding parameters to evaluate")
-    parser.add_argument('--convert', action="store_true", help="Convert older CSV-files to more readable format")
+    parser.add_argument('--convert_readable', action="store_true", help="Convert older CSV-files to more readable format")
+    parser.add_argument('--convert_non_ndf', action="store_true", help="Convert non NDF CSV-files to NDF CSV-files")
 
     args = parser.parse_args()
 
-    if(args.convert == True):
+    if(args.convert_readable == True):
         convert_param_set(args.csvfile)
+        exit(0)
+
+    if(args.convert_non_ndf == True):
+        non_ndf_conv(args.csvfile)
         exit(0)
 
     # Check that input has been given

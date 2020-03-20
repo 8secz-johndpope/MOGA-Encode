@@ -149,11 +149,12 @@ def non_ndf_conv(csvpath):
 
         for i in range(len(param_sets), 0):
             if (not i in ndf): del param_sets[i]
+            if (not i in ndf): del fitness[i]
 
     with open(csvpath + "_new.csv", mode='w') as data_file:
         data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for ps in param_sets:
-            data_writer.writerow([ps])
+        for i in range (0, len(param_sets)):
+            data_writer.writerow([param_sets[i], fitness[i]])
 
 def convert_param_set(csvpath):
     eval_sets = []

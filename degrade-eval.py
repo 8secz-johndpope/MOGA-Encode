@@ -71,6 +71,20 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
                 data_writer.writerow(data)
 
 
+def degrade_eval_dirs(path):
+    csv_files = []
+    for f in os.listdir(path):
+        if os.path.isfile(os.path.join(path, f)):
+            if f.endswith('.csv'):
+                csv_files.append(f)
+    
+    for f in csv_files: 
+        file_path = os.path.join(path, f)
+        args = f.split(":")
+        codec_arg = args[0]
+        rate_control_arg = args[1]
+        degrade_eval(codec_arg, rate_control_arg, file_path)
+
 
 def get_structural_comparison(orig_path, comp_path):
 
@@ -217,16 +231,22 @@ if(__name__ == "__main__"):
     parser.add_argument('-f', '--csvfile', default=None, help="CSV-file with coding parameters to evaluate")
     parser.add_argument('--convert_readable', action="store_true", help="Convert older CSV-files to more readable format")
     parser.add_argument('--convert_non_ndf', action="store_true", help="Convert non NDF CSV-files to NDF CSV-files")
+    parser.add_argument('-ed', '--evaldir', action="store_true", help="evaluate csvs in directory")
 
     args = parser.parse_args()
 
-    if(args.convert_readable == True):
+    if(args.convert_readable):
         convert_param_set(args.csvfile)
         exit(0)
 
-    if(args.convert_non_ndf == True):
+    if(args.convert_non_ndf):
         non_ndf_conv(args.csvfile)
         exit(0)
+
+    # Check that input has been given
+    if( args.evaldir):
+        degrade_eval_dirs(args.csvfile)
+        exit(1)
 
     # Check that input has been given
     if( args.csvfile == None and
@@ -237,3 +257,4 @@ if(__name__ == "__main__"):
 
     # Start degredation process
     degrade_eval(args.codec, args.ratecontrol, args.csvfile)
+

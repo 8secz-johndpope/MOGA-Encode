@@ -11,8 +11,30 @@ services:
         ipc: "host"
         volumes:
             - ./:/MOGA-Encode
-            - ../data:/data
-            - ../output:/output
+        tmpfs:
+            - /tmp
+        runtime: nvidia
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=all
+        devices:
+            - "/dev/dri:/dev/dri"
+        working_dir: /MOGA-Encode
+        stdin_open: true
+        tty: true
+        command: python3 moga.py
+
+    moga-encode-av1:
+        container_name: moga-encode-av1
+        build:
+            context: ../MOGA_AV1
+            dockerfile: Dockerfile
+        image: oscar/moga-encode-av1
+        network_mode: "host"
+        ipc: "host"
+        volumes:
+            - ../MOGA-Encode:/MOGA-Encode
+            - ./data:/data
+            - ./output:/output
         tmpfs:
             - /tmp
         runtime: nvidia
@@ -26,15 +48,16 @@ services:
         command: python3 moga.py
 
     hrnet:
-        container_name: hrnet
+        container_name: hrnet./ml_algs
         build:
-            context: ../HRNet
+            context: ./ml_algs/HRNet
             dockerfile: Dockerfile
         image: oscar/hrnet
         network_mode: "host"
         ipc: "host"
         volumes:
-            - ../data:/data
+            - ./data:/data
+            - ./ml_algs/HRNet:/mll
         runtime: nvidia
         environment:
             - NVIDIA_VISIBLE_DEVICES=all
@@ -46,14 +69,14 @@ services:
     gscnn:
         container_name: gscnn
         build:
-            context: ../GSCNN
+            context: ./ml_algs/GSCNN
             dockerfile: Dockerfile
         image: oscar/gscnn
         network_mode: "host"
         ipc: "host"
         volumes:
-            - ../data:/data
-            - ../GSCNN:/mll
+            - ./data:/data
+            - ./ml_algs/GSCNN:/mll
         runtime: nvidia
         environment:
             - NVIDIA_VISIBLE_DEVICES=all

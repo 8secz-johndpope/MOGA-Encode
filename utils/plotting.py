@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import pygmo as pyg
 import logging, csv, argparse
-import config as cfg
+import config.config as cfg
 logger = logging.getLogger('gen-alg')
 
 

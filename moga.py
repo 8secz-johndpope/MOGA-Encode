@@ -7,8 +7,8 @@ import random, logging, os, argparse, csv, pickle
 from datetime import datetime
 
 # Import modules
-import config as cfg
-import plotting as pl
+import config.config as cfg
+import utils.plotting as pl
 from optimization_problem import sweetspot_problem
 
 # Global logger object

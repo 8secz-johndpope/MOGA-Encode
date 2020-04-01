@@ -7,31 +7,32 @@ Contains constants and "static" variables which most modules use/share.
 Constants are all caps, variables are all lower case.
 '''
 
-OUTPUT_BASE = "/output"
-# OUTPUT_BASE = "/home/pine/Documents/ML/output"
+OUTPUT_BASE = "output"
 LOG_PATH = OUTPUT_BASE + "/logs/"
 POPULATION_PICKLE_PATH = OUTPUT_BASE + "/population.p"
 CLI_VERBOSITY = "INFO"  # ERROR, WARNING, INFO, DEBUG
 
 # gen-alg parameters
 POP_SIZE = 4 * 4    # must be a multiple of 4 and larger than 5!
-NO_GENERATIONS = 10
+NO_GENERATIONS = 1
 MOG_ALGS = ["nsga2"]   # nsga2, nspso, moead
 EPOCHS = 1
 PLOT_PATH = OUTPUT_BASE + "/results/"
 FITNESS_DATA_PATH = OUTPUT_BASE + "/results/"
 
-#ML_PERFORMANCE_BASELINE = 0.8162191842797382
-ML_PERFORMANCE_BASELINE = 0.806058279492062
-#ML_PERFORMANCE_MEASURE = "mean_IoU"
-ML_PERFORMANCE_MEASURE = "mean_iu"
+ML_PERFORMANCE_BASELINE = 0.8162191842797382
+#ML_PERFORMANCE_BASELINE = 0.806058279492062
+ML_PERFORMANCE_MEASURE = "mean_IoU"
+#ML_PERFORMANCE_MEASURE = "mean_iu"
 
-ML_DATA_BASE = "/data"
+ML_DATA_BASE = "data"
 # optimization_problem parameters
-ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/untouched_gscnn_seq/"
-#ML_DATA_OUTPUT = ML_DATA_BASE + "/HRNet-mldata/cityscapes/leftImg8bit/val/"
-ML_DATA_OUTPUT = ML_DATA_BASE + "/GSCNN-mldata/cityscapes/leftImg8bit_trainvaltest/leftImg8bit/val/"
-VIDEO_ENCODERS = ["libx264, hevc_nvenc, h264_nvenc"]
+#ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/scenario_suites/"
+#ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/scenario_suites_gn0,0005_gb0,5"
+ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/untouched_tiny/"
+ML_DATA_OUTPUT = ML_DATA_BASE + "/HRNet-mldata/cityscapes/leftImg8bit/val/"
+#ML_DATA_OUTPUT = ML_DATA_BASE + "/GSCNN-mldata/cityscapes/leftImg8bit_trainvaltest/leftImg8bit/val/"
+VIDEO_ENCODERS = ["libx264"]
 RATE_CONTROLS = { "h264_nvenc": ["CBR"],
                  "hevc_nvenc": ["CBR"],
                  "libx264":    ["ABR"],
@@ -41,14 +42,16 @@ RATE_CONTROLS = { "h264_nvenc": ["CBR"],
                  "hevc_vaapi": ["CQP"],
                  "vp9_vaapi": ["CBR"],
                  "libvpx-vp9": ["CBR"],
-                 "libaom-av1": ["CBR"] }
+                 "libaom-av1": ["CBR"],
+                 "libsvt_av1": ["CBR"] }
 
 # ffmpeg_utils parameters
-#TEMP_STORAGE_PATH = "/home/pine/Documents/ML/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
 TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
 IMAGE_TYPE = "png"
 NAMING_SCHEME =  '%06d'  # imgtype=png & scheme='%d' --> 1.png, 2.png, 3.png...
 IMG_COMP_LVL = 1
+
+JSON_PARAM_PATH_BASE = "config/encoding_parameters"
 
 
 # rest_communication parameters
@@ -78,7 +81,7 @@ def load_params_from_json(encoder, r_control):
     '''
     global opt_params, opt_high_bounds, opt_low_bounds, opt_cat_values, video_encoder, rate_control, opt_type, no_continous, opt_constants
 
-    JSON_PARAM_PATH = "encoding_parameters/" + encoder + "-parameters.json"
+    JSON_PARAM_PATH = JSON_PARAM_PATH_BASE + "/" + encoder + "-parameters.json"
     video_encoder = encoder
     rate_control = r_control
 

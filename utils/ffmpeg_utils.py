@@ -2,8 +2,8 @@
 
 import os, logging, ffmpeg, time
 import numpy as np
-from encoding_arguments import get_codec_args
-import config as cfg
+from utils.enc_arg_parser import get_codec_args
+import config.config as cfg
 logger = logging.getLogger('gen-alg')
 
 

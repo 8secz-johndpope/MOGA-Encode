@@ -1,0 +1,26 @@
+{
+    "CBR":{
+        "bounds":{
+            "b:v": [1, 50, "f"]
+        },
+        "categorical":{},
+        "constants":{
+            "pix_fmt": "yuv420p",
+            "rc": "vbr",
+            "preset": "4"
+        }
+    },
+    "CQP":{
+        "bounds":{
+            "qp": [0, 30, "i"],
+            "preset": [4, 6, "i"]
+        },
+        "categorical":{},
+        "constants":{
+            "pix_fmt": "yuv420p",
+            "rc": "cqp"
+        }
+    }
+}
+
+

@@ -2,10 +2,12 @@
 # Ignore some files and archives
 *.mbtree
 *.log
+*.csv
+*.pyc
 
 # Ignore some directories
 /data
 /__pycache__
-/results
+/output
 /logs
 /tmp

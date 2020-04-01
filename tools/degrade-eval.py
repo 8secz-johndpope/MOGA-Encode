@@ -5,17 +5,18 @@ import numpy as np
 import pygmo as pyg
 from skimage import io, metrics
 from multiprocessing import Pool
-import config as cfg
-import plotting as pl
+import config.config as cfg
+import utils.plotting as pl
 from tqdm import trange
 import random, logging, os, argparse, csv, re, json, shutil, time
 from datetime import datetime
 
-import ffmpeg_utils # import functions from ffmpeg_utils.py
-import rest_communication # import functions from rest_communication.py
+import utils.ffmpeg_utils as ffu    # import functions from ffmpeg_utils.py
+import utils.rest_communication as restcom # import functions from rest_communication.py
 
 # Global logger object
 logger = None
+ORIG_TEST = False
 
 
 def degrade_eval(codec_arg, rate_control_arg, csvpath):
@@ -30,11 +31,13 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
         if os.path.isdir(os.path.join(cfg.ML_DATA_INPUT, scenario)):
             scenarios.append(scenario)
 
-    ## Load param info from json specific for codec and rate control
-    cfg.load_params_from_json(codec_arg, rate_control_arg)
+    param_sets = ["orig"]
+    if not ORIG_TEST:
+        ## Load param info from json specific for codec and rate control
+        cfg.load_params_from_json(codec_arg, rate_control_arg)
 
-    # Loading coding parameters from CSV
-    param_sets = load_param_set(csvpath)
+        # Loading coding parameters from CSV
+        param_sets = load_param_set(csvpath)
 
     # Iterate through each scenario and evaluate each set of coding parameters
     for i in trange(len(scenarios)):
@@ -42,7 +45,7 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
         scenario = scenarios[i]
         input_scenario_dir = cfg.ML_DATA_INPUT +"/"+ scenario
         output_scenario_dir = cfg.ML_DATA_OUTPUT +"/situation"
-        original_scenario_size = ffmpeg_utils.get_directory_size(input_scenario_dir)
+        original_scenario_size = ffu.get_directory_size(input_scenario_dir)
         results = {}
 
         # Iterate through each set of coding parameters
@@ -51,13 +54,23 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
             shutil.rmtree(output_scenario_dir, ignore_errors=True)
 
             # Compress dataset and retrieve its size
-            comp_size = ffmpeg_utils.transcode(input_scenario_dir, output_scenario_dir, param_set)
+            comp_size = 1
+            mean_comparison_results = ["s", "s", "s", "s"]
+            if ORIG_TEST:
+                try:
+                    shutil.copytree(input_scenario_dir, output_scenario_dir)
+                except Exception as e:
+                    logger.error(e)
+                    exit(1)
+            else:
+                comp_size = ffu.transcode(input_scenario_dir, output_scenario_dir, param_set)
+                # Comparison between original and compressed frames using mean SSMI, PSNR and other metrics
+                mean_comparison_results = get_structural_comparison(input_scenario_dir, output_scenario_dir)
+
             
-            # Comparison between original and compressed frames using mean SSMI, PSNR and other metrics
-            mean_comparison_results = get_structural_comparison(input_scenario_dir, output_scenario_dir)
 
             # Retrieve fitness results
-            _, full_response = rest_communication.get_eval_from_ml_alg(eval_list=scenario)    # Get ML-algorithm results 
+            _, full_response = restcom.get_eval_from_ml_alg(eval_list=scenario)    # Get ML-algorithm results 
             comp_ratio = original_scenario_size/comp_size               # Calc compression-ratio
             results[decision_vector_to_string(param_set)] = [*full_response.values(), comp_ratio, *mean_comparison_results]
 
@@ -89,7 +102,7 @@ def degrade_eval_dirs(path):
 def get_structural_comparison(orig_path, comp_path):
 
     # Get the filenames of all images in the original dataset
-    filenames = ffmpeg_utils.get_names(orig_path)
+    filenames = ffu.get_names(orig_path)
     
     # Cityscapes: Only evaluate the frames which are evaluated by the ML-algorithms
     reduced_set = []

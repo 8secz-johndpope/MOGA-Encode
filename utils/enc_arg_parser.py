@@ -1,7 +1,7 @@
 # By: Oscar Andersson 2019
 import logging
 logger = logging.getLogger('gen-alg')
-import config as cfg
+import config.config as cfg
 
 def get_codec_args(decision_vector):
     '''
@@ -51,6 +51,7 @@ def get_codec_args(decision_vector):
     elif(cfg.video_encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
     elif(cfg.video_encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, decision_vector)
     elif(cfg.video_encoder == "libaom-av1"): return get_libaomav1_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "libsvt_av1"): return get_libaomav1_args(input_args, output_args, decision_vector)
     else: raise Exception("Could not find codec")
 
 

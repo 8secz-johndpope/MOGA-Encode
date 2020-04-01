@@ -1,5 +1,5 @@
 import requests, json, logging
-import config as cfg
+import config.config as cfg
 logger = logging.getLogger('gen-alg')
 
 

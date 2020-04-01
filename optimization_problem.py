@@ -1,13 +1,15 @@
 # By: Oscar Andersson 2019
 
-import ffmpeg_utils # import functions from ffmpeg_utils.py
 import pygmo as pyg
 import numpy as np
 import os, time, random, csv
-import rest_communication
 import shutil, logging
-import config as cfg
-import plotting as pl
+
+import config.config as cfg
+import utils.ffmpeg_utils as ffu # import functions from ffmpeg_utils.py
+import utils.plotting as pl
+import utils.rest_communication as rest_com
+
 logger = logging.getLogger('gen-alg')
 
 # Problem class which defines the problem and contain functions for solving it
@@ -33,7 +35,7 @@ class sweetspot_problem:
         self.gen = 0
         self.fitness_of_gen = []
         self.complete_results = {}
-        self.original_img_size = ffmpeg_utils.get_directory_size(cfg.ML_DATA_INPUT)
+        self.original_img_size = ffu.get_directory_size(cfg.ML_DATA_INPUT)
         logger.debug("Problem initiated")
 
 
@@ -98,13 +100,13 @@ class sweetspot_problem:
             input_clip_dir = cfg.ML_DATA_INPUT + clip
             output_clip_dir = cfg.ML_DATA_OUTPUT + clip
             logger.debug("Applying degredation to clip: " + input_clip_dir)
-            comp_size += ffmpeg_utils.transcode(input_clip_dir, output_clip_dir, x)
+            comp_size += ffu.transcode(input_clip_dir, output_clip_dir, x)
         transcode_time = time.time() - start_time
         logger.info("Time for transcode: " + str(int(round(transcode_time)))+" seconds")
 
         # Retrieve fitness results
         logger.info("Requesting evaluation from ML-algorithm...")
-        score, full_response = rest_communication.get_eval_from_ml_alg()    # Get ML-algorithm results 
+        score, full_response = rest_com.get_eval_from_ml_alg()    # Get ML-algorithm results 
         comp_ratio = self.original_img_size/comp_size               # Calc compression-ratio
         logger.info("ML-performance: " + str(score) + "\nComp-ratio: " + str(comp_ratio))
         logger.debug("All measures: " + str(full_response))

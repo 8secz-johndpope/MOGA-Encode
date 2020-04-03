@@ -7,9 +7,12 @@ from multiprocessing import Pool
 from tqdm import trange
 import random, logging, os, argparse, csv, re, json, shutil, time
 from datetime import datetime
-import config as cfg
+import config.config as cfg
 
 
+# Values which regulate data degredation
+GAUSSIAN_BLUR = 0
+GAUSSIAN_NOISE = 0.00075
 
 
 def get_files_under_dir(top_dir, dir_path):
@@ -35,6 +38,8 @@ def get_files_under_dir(top_dir, dir_path):
 
 
 def make_noisy_dataset(ds_in_path, ds_out_path):
+
+    print("Degrading " + ds_in_path)
 
     # Check that output dir is present
     if not os.path.exists(ds_out_path):
@@ -64,8 +69,10 @@ def add_noise_to_image(args):
     image = io.imread(orig_path)
 
     # Add noise to image
-    image = util.random_noise(image, mode='gaussian', var=0.0005)
-    image = filters.gaussian(image, sigma=0.5, multichannel=True)
+    if GAUSSIAN_NOISE != 0:
+        image = util.random_noise(image, mode='gaussian', var=GAUSSIAN_NOISE)
+    if GAUSSIAN_BLUR != 0:
+        image = filters.gaussian(image, sigma=GAUSSIAN_BLUR, multichannel=True)
     image = util.img_as_ubyte(image)
 
     # Save image
@@ -80,11 +87,17 @@ if(__name__ == "__main__"):
     # Create timestamp used for logging and results
     cfg.timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    parser = argparse.ArgumentParser(description='Multi objective genetic algorithm')
+    parser = argparse.ArgumentParser(description='Degrade dataset')
+    parser.add_argument('-p', '--dataset_path', default=None, help="CSV-file with coding parameters to evaluate")
     # TODO: add options for degredation
 
     args = parser.parse_args()
+    if(args.dataset_path != None):
+        cfg.ML_DATA_INPUT = args.dataset_path
 
-    cfg.ML_DATA_INPUT = "/data/Cityscapes-dataset/untouched_tiny"
+    if(cfg.ML_DATA_INPUT[-1] == '/'):
+        cfg.ML_DATA_INPUT = cfg.ML_DATA_INPUT[:-1]
+
+
     make_noisy_dataset(cfg.ML_DATA_INPUT, cfg.ML_DATA_INPUT + "_degraded")
 

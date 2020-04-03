@@ -248,6 +248,10 @@ if(__name__ == "__main__"):
 
     args = parser.parse_args()
 
+    if ORIG_TEST:
+        degrade_eval("orig", "dataset", "")
+        exit(0)
+
     if(args.convert_readable):
         convert_param_set(args.csvfile)
         exit(0)

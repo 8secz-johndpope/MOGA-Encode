@@ -1,5 +1,6 @@
 # By: Oscar Andersson 2019
 import json, logging, os
+from datetime import datetime
 
 logger = None
 
@@ -119,7 +120,8 @@ def configure_logging():
     '''
     Configures the logging of information in logfiles and in CLIs.
     '''
-    global logger
+    global logger, timestamp
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     # Check/prepare directories for storing data from this session
     if not os.path.isdir(PLOT_PATH): os.mkdir(PLOT_PATH) 

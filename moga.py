@@ -161,7 +161,6 @@ if(__name__ == "__main__"):
     '''
 
     # Create timestamp used for logging and results
-    cfg.timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     cfg.configure_logging()
     logger = logging.getLogger('gen-alg')
 

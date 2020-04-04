@@ -129,13 +129,7 @@ class sweetspot_problem:
         logger.info("Entering store_results!\n Fitness_o_gen: " +
                      str(len(self.fitness_of_gen)) + "  epoch: " + str(cfg.epoch) + 
                      "  decision vector: " + str(x))
-
-        with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/data.csv', mode='a') as data_file:
-            data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.mog_alg, np.array2string(x, precision = 6, separator=','), str(time)]
-            data = np.concatenate((data, fitness), axis=None)
-            data = np.concatenate((data, str(full_response)), axis=None)
-            data_writer.writerow(data)
+        self.update_data_csv(x, fitness, time, full_response)
 
 
         if( (len(self.fitness_of_gen) >= cfg.POP_SIZE)):
@@ -147,24 +141,36 @@ class sweetspot_problem:
             # If this is the last generation, plot and print extended epoch information
             if(self.gen == cfg.NO_GENERATIONS):
                 logger.info("Last generation, collecting the fitness of all decision vectors evaluated")
-                fitness_keys = [ key for key in self.fitness_dict.keys() ]
-                fitness_values = [ val for val in self.fitness_dict.values() ]
-                _, _, dc, ndr  = pyg.fast_non_dominated_sorting(fitness_values)
-                ndf = pyg.non_dominated_front_2d(fitness_values)
-                
-                logger.info(name + "\nNon dominated vectors: "+str(len(ndf)) + "\nDomination count: " + str(dc) +"\nNon domination ranks: " + str(ndr))
-                pl.plot_front(name +" all fits", fitness_values, ndf)
-                
-                # Save ndf results to file
-                with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/NDF-' + name + '.csv', mode='w') as data_file:
-                    data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                    for i in ndf:
-                        data = np.concatenate((fitness_keys[i], fitness_values[i]), axis=None)
-                        data = np.concatenate((data, self.complete_results[fitness_keys[i]]), axis=None)
-                        data_writer.writerow(data)
+                self.write_ndf_csv(name)
 
             # Plot generation specific information
             pl.plot_front(name +" at gen:"+str(self.gen), self.fitness_of_gen)
             self.fitness_of_gen = []
             self.gen += 1
 
+
+
+    def update_data_csv(self, x, fitness, time, full_response):
+        with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/data.csv', mode='a') as data_file:
+            data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.mog_alg, np.array2string(x, precision = 6, separator=','), str(time)]
+            data = np.concatenate((data, fitness), axis=None)
+            data = np.concatenate((data, str(full_response)), axis=None)
+            data_writer.writerow(data)
+
+    def write_ndf_csv(self, name):
+        fitness_keys = [ key for key in self.fitness_dict.keys() ]
+        fitness_values = [ val for val in self.fitness_dict.values() ]
+        _, _, dc, ndr  = pyg.fast_non_dominated_sorting(fitness_values)
+        ndf = pyg.non_dominated_front_2d(fitness_values)
+        
+        logger.info(name + "\nNon dominated vectors: "+str(len(ndf)) + "\nDomination count: " + str(dc) +"\nNon domination ranks: " + str(ndr))
+        pl.plot_front(name +" all fits", fitness_values, ndf)
+        
+        # Save ndf results to file
+        with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/NDF-' + name + '.csv', mode='w') as data_file:
+            data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for i in ndf:
+                data = np.concatenate((fitness_keys[i], fitness_values[i]), axis=None)
+                data = np.concatenate((data, self.complete_results[fitness_keys[i]]), axis=None)
+                data_writer.writerow(data)

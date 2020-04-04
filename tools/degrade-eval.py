@@ -263,7 +263,7 @@ if(__name__ == "__main__"):
     # Check that input has been given
     if( args.evaldir):
         degrade_eval_dirs(args.csvfile)
-        exit(1)
+        exit(0)
 
     # Check that input has been given
     if( args.csvfile == None and

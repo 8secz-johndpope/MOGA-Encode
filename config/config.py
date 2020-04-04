@@ -1,6 +1,7 @@
 # By: Oscar Andersson 2019
-import json, logging
-logger = logging.getLogger('gen-alg')
+import json, logging, os
+
+logger = None
 
 '''
 Contains constants and "static" variables which most modules use/share.
@@ -113,3 +114,32 @@ def load_params_from_json(encoder, r_control):
         if param_bounds[param][2] == "f": no_continous+=1
     logger.debug("Params loaded: " + str(opt_params))
 
+
+def configure_logging():
+    '''
+    Configures the logging of information in logfiles and in CLIs.
+    '''
+    global logger
+
+    # Check/prepare directories for storing data from this session
+    if not os.path.isdir(PLOT_PATH): os.mkdir(PLOT_PATH) 
+    if not os.path.isdir(LOG_PATH): os.mkdir(LOG_PATH)
+    if not os.path.isdir(PLOT_PATH + timestamp): os.mkdir(PLOT_PATH + timestamp)
+
+    # create logger
+    logger = logging.getLogger('gen-alg')
+    logger.setLevel(logging.DEBUG)
+
+    # Logfiles will contain full debug information
+    file_log = logging.FileHandler(filename=LOG_PATH+timestamp+'.log')
+    file_log.setLevel(logging.DEBUG)   
+    file_log.setFormatter(logging.Formatter('Time: %(asctime)s  Level: %(levelname)s\n%(message)s\n'))
+
+    # Less information is printed into the console
+    cli_log = logging.StreamHandler()
+    cli_log.setLevel(CLI_VERBOSITY)
+    cli_log.setFormatter(logging.Formatter('%(message)s'))
+
+    # Add handlers to 'gen-alg' logger
+    logger.addHandler(file_log)
+    logger.addHandler(cli_log)

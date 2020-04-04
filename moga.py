@@ -11,9 +11,6 @@ import config.config as cfg
 import utils.plotting as pl
 from optimization_problem import sweetspot_problem
 
-# Global logger object
-logger = None
-
 
 def get_optimization_algorithm(randseed):
     '''
@@ -158,45 +155,15 @@ def resume_optimisation(codec, rate_control, moga, base_gen, epoch):
         pickle.dump( pop, open( cfg.POPULATION_PICKLE_PATH, "wb" ) )                    
 
 
-
-def configure_logging():
-    '''
-    Configures the logging of information in logfiles and in CLIs.
-    '''
-    global logger
-
-    # Check/prepare directories for storing data from this session
-    if not os.path.isdir(cfg.PLOT_PATH): os.mkdir(cfg.PLOT_PATH) 
-    if not os.path.isdir(cfg.LOG_PATH): os.mkdir(cfg.LOG_PATH)
-    if not os.path.isdir(cfg.PLOT_PATH + cfg.timestamp): os.mkdir(cfg.PLOT_PATH + cfg.timestamp)
-
-    # create logger
-    logger = logging.getLogger('gen-alg')
-    logger.setLevel(logging.DEBUG)
-
-    # Logfiles will contain full debug information
-    file_log = logging.FileHandler(filename=cfg.LOG_PATH+cfg.timestamp+'.log')
-    file_log.setLevel(logging.DEBUG)   
-    file_log.setFormatter(logging.Formatter('Time: %(asctime)s  Level: %(levelname)s\n%(message)s\n'))
-
-    # Less information is printed into the console
-    cli_log = logging.StreamHandler()
-    cli_log.setLevel(cfg.CLI_VERBOSITY)
-    cli_log.setFormatter(logging.Formatter('%(message)s'))
-
-    # Add handlers to 'gen-alg' logger
-    logger.addHandler(file_log)
-    logger.addHandler(cli_log)
-
-
 if(__name__ == "__main__"):
     '''
     The main function which starts the entire optimisation algorithm
     '''
-    
+
     # Create timestamp used for logging and results
     cfg.timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    configure_logging()
+    cfg.configure_logging()
+    logger = logging.getLogger('gen-alg')
 
     parser = argparse.ArgumentParser(description='Multi objective genetic algorithm')
     parser.add_argument('-a', '--moga', default=None, help="Evaluate using specific ML-algorithm")

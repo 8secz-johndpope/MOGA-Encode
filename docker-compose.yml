@@ -48,7 +48,7 @@ services:
         command: python3 moga.py
 
     hrnet:
-        container_name: hrnet./ml_algs
+        container_name: hrnet
         build:
             context: ./ml_algs/HRNet
             dockerfile: Dockerfile

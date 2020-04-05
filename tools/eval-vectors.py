@@ -10,7 +10,8 @@ import logging, argparse, csv, re, os
 import config.config as cfg
 from optimization_problem import sweetspot_problem
 
-
+SELECTION = 5
+BR_STEPSIZE = 20/3
 
 def evaluate_vectors_in_csv(csvpath, codec_arg, rate_control_arg):
     print("Evaluating vectors of: " + codec_arg + " " + rate_control_arg)
@@ -33,13 +34,13 @@ def evaluate_vectors_in_csv(csvpath, codec_arg, rate_control_arg):
             x = [elem for elem in x if elem != ""]
             old_param_sets.append(x)
     old_param_sets = np.asfarray(old_param_sets,float)
-    old_param_sets = old_param_sets[:10]
+    old_param_sets = old_param_sets[:SELECTION]
 
     new_set = []   
     for old_param in old_param_sets:
         for mult in range(1, 4):
             new_param = old_param
-            br = 50. + (mult*20)/3
+            br = 50. + mult * BR_STEPSIZE
             new_param[0] = br
             new_set.append(list(new_param))
 

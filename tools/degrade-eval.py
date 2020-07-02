@@ -19,7 +19,9 @@ logger = None
 ORIG_TEST = False
 
 
-def degrade_eval(codec_arg, rate_control_arg, csvpath):
+def degrade_eval(codec_arg, rate_control_arg, csvpath, degradation):
+
+    ML_DATA_INPUT = cfg.ML_DATA_EVAL_INPUT[degradation]
 
     # Set codec and rate control of which the coding parameters are for
     cfg.VIDEO_ENCODERS = [codec_arg]
@@ -27,8 +29,8 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
 
     # List all scenarios to degrade
     scenarios = []
-    for scenario in os.listdir(cfg.ML_DATA_INPUT):
-        if os.path.isdir(os.path.join(cfg.ML_DATA_INPUT, scenario)):
+    for scenario in os.listdir(ML_DATA_INPUT):
+        if os.path.isdir(os.path.join(ML_DATA_INPUT, scenario)):
             scenarios.append(scenario)
 
     param_sets = ["orig"]
@@ -40,11 +42,12 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
         param_sets = load_param_set(csvpath)
 
     # Iterate through each scenario and evaluate each set of coding parameters
+    logger.info("Scenarios: " + str(scenarios))
     for i in trange(len(scenarios)):
 
         scenario = scenarios[i]
-        input_scenario_dir = cfg.ML_DATA_INPUT +"/"+ scenario
-        output_scenario_dir = cfg.ML_DATA_OUTPUT +"/situation"
+        input_scenario_dir = ML_DATA_INPUT +"/"+ scenario
+        output_scenario_dir = cfg.ML_DATA_OUTPUT +"/scenario"
         original_scenario_size = ffu.get_directory_size(input_scenario_dir)
         results = {}
 
@@ -55,7 +58,7 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
 
             # Compress dataset and retrieve its size
             comp_size = 1
-            mean_comparison_results = ["s", "s", "s", "s"]
+            mean_comparison_results = ["", "", "", ""]
             if ORIG_TEST:
                 try:
                     shutil.copytree(input_scenario_dir, output_scenario_dir)
@@ -67,15 +70,13 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
                 # Comparison between original and compressed frames using mean SSMI, PSNR and other metrics
                 mean_comparison_results = get_structural_comparison(input_scenario_dir, output_scenario_dir)
 
-            
-
             # Retrieve fitness results
             _, full_response = restcom.get_eval_from_ml_alg(eval_list=scenario)    # Get ML-algorithm results 
             comp_ratio = original_scenario_size/comp_size               # Calc compression-ratio
             results[decision_vector_to_string(param_set)] = [*full_response.values(), comp_ratio, *mean_comparison_results]
 
         # Save scenario results to CSV-file
-        with open(cfg.FITNESS_DATA_PATH+cfg.timestamp+'/'+codec_arg+'_'+rate_control_arg+'_results.csv', mode='a') as data_file:
+        with open(cfg.RESULTS_PATH+cfg.timestamp+'/'+codec_arg+'_'+rate_control_arg+'_results.csv', mode='a') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for param_set in results.keys():
                 data = results[param_set]
@@ -84,7 +85,7 @@ def degrade_eval(codec_arg, rate_control_arg, csvpath):
                 data_writer.writerow(data)
 
 
-def degrade_eval_dirs(path):
+def degrade_eval_dirs(path, degradation):
     csv_files = []
     for f in os.listdir(path):
         if os.path.isfile(os.path.join(path, f)):
@@ -96,7 +97,7 @@ def degrade_eval_dirs(path):
         args = f.split(":")
         codec_arg = args[0]
         rate_control_arg = args[1]
-        degrade_eval(codec_arg, rate_control_arg, file_path)
+        degrade_eval(codec_arg, rate_control_arg, file_path, degradation)
 
 
 def get_structural_comparison(orig_path, comp_path):
@@ -161,45 +162,6 @@ def load_param_set(csvpath):
     return np.asfarray(param_sets,float)
 
 
-def non_ndf_conv(csvpath):
-    fitness = []
-    param_sets = []
-    ndf = []
-    param_index, perf_index, comp_index = 4, 6, 7
-    with open(csvpath) as csv_file:
-        csv_data = csv.reader(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
-        for row in csv_data:
-            fitness.append( [float(row[perf_index]), float(row[comp_index])] )
-            param_sets.append(string_to_decision_vector(str(row[param_index])))
-        ndf = pyg.non_dominated_front_2d(fitness)
-
-        for i in range(len(param_sets), 0):
-            if (not i in ndf): del param_sets[i]
-            if (not i in ndf): del fitness[i]
-
-    with open(csvpath + "_new.csv", mode='w') as data_file:
-        data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for i in range (0, len(param_sets)):
-            data_writer.writerow([param_sets[i], fitness[i]])
-
-def convert_param_set(csvpath):
-    eval_sets = []
-    with open(csvpath) as csv_file:
-        csv_data = csv.reader(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for row in csv_data:
-            x = str(row[0])
-            x = x.replace('\n', '').replace('[', '').replace(']', '')
-            x = re.sub('\s+', ',', x.strip())
-            row[0] = decision_vector_to_string( np.asfarray(x.split(","), float) )
-            eval_sets.append(row)
-
-    with open(csvpath + "_new.csv", mode='w') as data_file:
-        data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for es in eval_sets:
-            data_writer.writerow(es)
-
-
 
 if(__name__ == "__main__"):
     '''
@@ -211,30 +173,24 @@ if(__name__ == "__main__"):
     cfg.configure_logging()
 
     parser = argparse.ArgumentParser(description='Multi objective genetic algorithm')
-    parser.add_argument('-c', '--codec', default=None, help="Codec of evaluation")
-    parser.add_argument('-rc', '--ratecontrol', default=None, help="Rate control of evaluation")
     parser.add_argument('-f', '--csvfile', default=None, help="CSV-file with coding parameters to evaluate")
-    parser.add_argument('--convert_readable', action="store_true", help="Convert older CSV-files to more readable format")
-    parser.add_argument('--convert_non_ndf', action="store_true", help="Convert non NDF CSV-files to NDF CSV-files")
+    parser.add_argument('-d', '--degradation', default="nondeg", help="The degradation of data: nondeg, rain, noise, moving")
     parser.add_argument('-ed', '--evaldir', action="store_true", help="evaluate csvs in directory")
+    parser.add_argument('-c', '--codec', default=None, help="Codec of evaluation (used if evaldir in not set)")
+    parser.add_argument('-rc', '--ratecontrol', default=None, help="Rate control of evaluation  (used if evaldir in not set)")
+    parser.add_argument('--orig_test', action="store_true", help="Collect data for uncompressed dataset")
+    
 
     args = parser.parse_args()
 
-    if ORIG_TEST:
-        degrade_eval("orig", "dataset", "")
+    if args.orig_test:
+        degrade_eval("orig", "dataset", "", "nondeg")
         exit(0)
 
-    if(args.convert_readable):
-        convert_param_set(args.csvfile)
-        exit(0)
-
-    if(args.convert_non_ndf):
-        non_ndf_conv(args.csvfile)
-        exit(0)
 
     # Check that input has been given
     if( args.evaldir):
-        degrade_eval_dirs(args.csvfile)
+        degrade_eval_dirs(args.csvfile, args.degradation)
         exit(0)
 
     # Check that input has been given
@@ -245,5 +201,5 @@ if(__name__ == "__main__"):
         exit(1)
 
     # Start degredation process
-    degrade_eval(args.codec, args.ratecontrol, args.csvfile)
+    degrade_eval(args.codec, args.ratecontrol, args.csvfile, args.degradation)
 

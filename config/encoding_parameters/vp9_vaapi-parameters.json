@@ -1,7 +1,7 @@
 {
     "CBR":{
         "bounds":{
-            "b:v": [1, 50, "f"],
+            "b:v": [1, 150, "f"],
             "bufratio": [0.25, 4, "f"],
             "rc_mode": [0, 1, "c"],
             "compression_level": [0 , 2, "c"],
@@ -38,7 +38,6 @@
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
-            "pix_fmt": "yuv444p",
             "rc_mode": "CQP",
             "bsf:v": "vp9_raw_reorder,vp9_superframe"
         }

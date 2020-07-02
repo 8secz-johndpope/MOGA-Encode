@@ -100,6 +100,52 @@
             "pix_fmt": "yuv444p"
         }
     },
+    "CQP": {
+        "bounds":{
+            "aq-strength": [0.1, 1.9, "f"],
+            "qp": [1, 40, "i"],
+            "preset": [0, 6, "c"],
+            "tune": [0, 3, "c"], 
+            "me_method": [0, 4, "c"],
+            "coder": [0, 1, "c"],
+            "cmp": [0, 1, "c"],
+            "aq-mode":  [0, 2, "c"],
+            "weightp":  [0, 2, "c"],
+            "b-pyramid": [0, 2, "c"],
+            "direct-pred": [0, 3, "c"],
+            "deblock-alpha": [-2, 2, "i"],
+            "deblock-beta": [-2, 2, "i"],
+            "weightb": [0, 1, "i"],
+            "b_strategy": [0, 2, "i"],
+            "g": [50, 1000, "i"],
+            "keyint_min": [10, 40, "i"],
+            "psy": [0, 1, "i"],
+            "intra-refresh": [0, 1, "i"],
+            "trellis": [0, 1 , "i"],
+            "sc_threshold": [0, 60, "i"],
+            "bf": [1, 16, "i"],
+            "me_range": [12, 24, "i"],
+            "subq": [1, 10, "i"],
+            "rc-lookahead": [20, 60, "i"],
+            "b-bias": [-100, 100, "i"],
+            "mixed-refs": [0, 1, "i"],
+            "8x8dct": [0, 1, "i"]
+        },
+        "categorical":{
+            "tune": ["none", "stillimage", "film", "grain"],
+            "preset": ["veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"],
+            "me_method": ["dia", "hex", "umh", "esa", "tesa"],
+            "direct-pred": ["none", "spatial", "temporal", "auto"],
+            "coder": ["ac", "vlc"],
+            "cmp": ["chroma", "sad"],
+            "aq-mode": ["none", "variance", "autovariance"],
+            "weightp": ["none", "simple", "smart"],
+            "b-pyramid": ["none", "strict", "normal"]
+        },
+        "constants":{
+            "pix_fmt": "yuv444p"
+        }
+    },
     "Near-LL": {
         "bounds":{
             "preset": [0, 1, "c"]

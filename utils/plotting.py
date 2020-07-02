@@ -35,11 +35,11 @@ def plot_front(title, fitness, ndf=[]):
     #ax.set_xlim(xmin=1, xmax=300)
 
     # Save plot
-    fig.savefig(cfg.PLOT_PATH + cfg.timestamp +  "/pf-" + title +"-linear"+".png", dpi=300, format='png')
+    fig.savefig(cfg.RESULTS_PATH + cfg.timestamp +  "/pf-" + title +"-linear"+".png", dpi=300, format='png')
 
     ax.set_xscale('log')
     ax.set_xlabel("Compression ratio (logarithmic scale)")
-    fig.savefig(cfg.PLOT_PATH + cfg.timestamp +  "/pf-" + title +"-log"+".png", dpi=300, format='png')
+    fig.savefig(cfg.RESULTS_PATH + cfg.timestamp +  "/pf-" + title +"-log"+".png", dpi=300, format='png')
 
     plt.close(fig)
 

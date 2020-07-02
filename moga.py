@@ -17,17 +17,17 @@ def get_optimization_algorithm(randseed):
     Returns an optimisation algorithm
     '''
     opt_alg = None
-    if(cfg.mog_alg == "nsga2"):
+    if(cfg.MOG_ALG == "nsga2"):
         # cr: crossover probability, m: mutation probability
         # eta_c: distribution index for crossover, eta_m: distribution index for mutation
         opt_alg = pyg.algorithm( pyg.nsga2(gen=1, cr=0.925, m=0.05,
                                            eta_c=10, eta_m=50, seed=randseed) )
-    elif(cfg.mog_alg == "moead"):
+    elif(cfg.MOG_ALG == "moead"):
         opt_alg = pyg.algorithm ( pyg.moead(gen = 1, weight_generation = "grid",
                                             decomposition = "tchebycheff", neighbours = 5,
                                             CR = 1, F = 0.5, eta_m = 20, realb = 0.9,
                                             limit = 2, preserve_diversity = True) )
-    elif(cfg.mog_alg == "nspso"):
+    elif(cfg.MOG_ALG == "nspso"):
         opt_alg = pyg.algorithm ( pyg.nspso(gen = 1, omega = 0.6, c1 = 0.01, c2 = 0.5, chi = 0.5,
                                             v_coeff = 0.5, leader_selection_range = 2,
                                             diversity_mechanism = "crowding distance",
@@ -83,7 +83,7 @@ def sweetspot_search(codec_arg, rate_control_arg, moga_arg):
     # Change optimisation config if a specific argument is set
     if codec_arg is not None: cfg.VIDEO_ENCODERS = [codec_arg]
     if rate_control_arg is not None: cfg.RATE_CONTROLS[codec_arg] = [rate_control_arg]
-    if moga_arg is not None: cfg.MOG_ALGS = [moga_arg]
+    if moga_arg is not None: cfg.MOG_ALG = moga_arg
     
 
     # Evaluate each codec in VIDEO_ENCODERS list
@@ -94,51 +94,48 @@ def sweetspot_search(codec_arg, rate_control_arg, moga_arg):
             for rate_control in cfg.RATE_CONTROLS[codec]:
                 # Load parameters for codec
                 cfg.load_params_from_json(codec, rate_control)
-                #logger.info("Optimising " + codec + " using " + rate_control + "...")
 
-                for alg in cfg.MOG_ALGS:
-                    cfg.epoch = epoch
-                    cfg.mog_alg = alg
-                    logger.info("----------- EPOCH: " + str(epoch) + " Alg: " + alg +
-                                " Codec: " + str(codec) +":"+str(rate_control)+" ------------")
+                cfg.epoch = epoch
+                logger.info("----------- EPOCH: " + str(epoch) + " Alg: " + cfg.MOG_ALG +
+                            " Codec: " + str(codec) +":"+str(rate_control)+" ------------")
 
-                    # Get optimization problem and algorithm
-                    opt_prob = pyg.problem(sweetspot_problem())
+                # Get optimization problem and algorithm
+                opt_prob = pyg.problem(sweetspot_problem())
 
-                    # Initiate population
-                    rand_seed = epoch*3+1  # An arbitrary but repeatable randomisation seed
-                    random.seed(rand_seed)
-                    pop = pyg.population(prob=opt_prob, seed=rand_seed)
-                    pop = uniform_init(opt_prob, pop)
+                # Initiate population
+                rand_seed = cfg.get_random_seed(epoch)
+                random.seed(rand_seed)
+                pop = pyg.population(prob=opt_prob, seed=rand_seed)
+                pop = uniform_init(opt_prob, pop)
 
-                    # Set up optimization algorithm
-                    opt_alg = get_optimization_algorithm(rand_seed)
+                # Set up optimization algorithm
+                opt_alg = get_optimization_algorithm(rand_seed)
 
-                    # Evolve pop using opt_alg
-                    logger.debug("Starting evolution process")
-                    for gen in range(0, cfg.NO_GENERATIONS):
-                        logger.info("Generation: " + str(gen+1))
-                        pop = opt_alg.evolve(pop)
-                        pickle.dump( pop, open( cfg.POPULATION_PICKLE_PATH, "wb" ) )                    
+                # Evolve pop using opt_alg
+                logger.debug("Starting evolution process")
+                for gen in range(0, cfg.NO_GENERATIONS):
+                    logger.info("Generation: " + str(gen+1))
+                    pop = opt_alg.evolve(pop)
+                    pickle.dump( pop, open( cfg.POPULATION_PICKLE_PATH, "wb" ) )                    
 
 
 
 def resume_optimisation(codec, rate_control, moga, base_gen, epoch):
-
+    '''
+    Resumes optimisation of a population
+    '''
     cfg.VIDEO_ENCODERS = [codec]
     cfg.RATE_CONTROLS[codec] = [rate_control]
-    cfg.MOG_ALGS = [moga]
+    cfg.MOG_ALG = moga
     
     # Load parameters for codec
     cfg.load_params_from_json(codec, rate_control)
     logger.info("Optimising " + codec + " using " + rate_control + "...")
 
     cfg.epoch = epoch
-    cfg.mog_alg = moga
     
     # Initiate population
-    rand_seed = epoch*3+1  # An arbitrary but repeatable randomisation seed
-    # random.seed(rand_seed)
+    rand_seed = cfg.get_random_seed(epoch)
 
     logger.debug("Loading population from pickle")
     pop = pickle.load( open( cfg.POPULATION_PICKLE_PATH, "rb" ) )

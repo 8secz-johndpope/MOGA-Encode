@@ -1,6 +1,7 @@
 """
 Copyright (C) 2019 NVIDIA Corporation.  All rights reserved.
 Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
+Modified by Oscar Andersson
 
 # Code adapted from:
 # https://github.com/fperazzi/davis/blob/master/python/lib/davis/measures/f_boundary.py

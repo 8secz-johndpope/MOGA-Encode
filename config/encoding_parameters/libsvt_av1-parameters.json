@@ -12,13 +12,13 @@
     },
     "CQP":{
         "bounds":{
-            "qp": [0, 30, "i"],
-            "preset": [4, 6, "i"]
+            "qp": [0, 30, "i"]
         },
         "categorical":{},
         "constants":{
-            "pix_fmt": "yuv420p",
-            "rc": "cqp"
+            "pix_fmt": "yuv444p",
+            "rc": "cqp",
+            "preset": "4"
         }
     }
 }

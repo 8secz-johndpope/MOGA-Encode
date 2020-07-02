@@ -18,13 +18,11 @@
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
-            "pix_fmt": "yuv444p"
         }
     },
     "CQP":{
         "bounds":{
             "qp": [1, 40, "i"],
-            "rc_mode": [0 , 1, "c"],
             "compression_level": [0 , 2, "c"],
             "g": [50, 1000, "i"],
             "sc_threshold": [0, 60, "i"],
@@ -33,11 +31,10 @@
             "b_depth": [1, 5, "i"]
         },
         "categorical":{
-            "rc_mode": ["CQP", "ICQ"],
             "compression_level": ["1" ,"4" ,"7"]
         },
         "constants":{
-            "pix_fmt": "yuv444p"
+            "rc_mode": "CQP"
         }
     }
 }

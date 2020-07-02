@@ -26,8 +26,8 @@ services:
     moga-encode-av1:
         container_name: moga-encode-av1
         build:
-            context: ../MOGA_AV1
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: Dockerfile-AV1
         image: oscar/moga-encode-av1
         network_mode: "host"
         ipc: "host"

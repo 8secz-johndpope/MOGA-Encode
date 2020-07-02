@@ -20,7 +20,6 @@ def img_to_vid(images_dir, decision_vector):
     out_path = cfg.TEMP_STORAGE_PATH
 
     if(is_two_pass):
-        if cfg.video_encoder == "libaom-av1" : output_args["cpu-used"] = "8"
         try:
             logger.debug("Applying two passes!")
             output_args["pass"] = "1"
@@ -36,10 +35,9 @@ def img_to_vid(images_dir, decision_vector):
             logger.critical("FFMPEG: error converting images to video")
             logger.critical(ex.stderr.decode('utf8'))
             logger.critical(output_args)
-            return False
+            raise Exception("Failed transcode")
 
     try:
-        if cfg.video_encoder == "libaom-av1" : output_args["cpu-used"] = "0"
         (
             ffmpeg
             .input(filenaming, **input_args)
@@ -51,8 +49,7 @@ def img_to_vid(images_dir, decision_vector):
         logger.critical("FFMPEG: error converting images to video")
         logger.critical(ex.stderr.decode('utf8'))
         logger.critical(output_args)
-        return False
-    return True
+        raise Exception("Failed transcode")
 
 
 def vid_to_img(images_dir):
@@ -75,8 +72,7 @@ def vid_to_img(images_dir):
     except ffmpeg.Error as ex:
         logger.critical("FFMPEG: error converting video to images")
         logger.critical(ex.stderr.decode('utf8'))
-        return False
-    return True
+        raise Exception("Failed transcode")
 
 
 def transcode(img_path, output_dir, decision_vector):
@@ -93,23 +89,29 @@ def transcode(img_path, output_dir, decision_vector):
 
     tries1, tries2 = 0, 0
     while(True):
-        if(img_to_vid(img_path, decision_vector)): break
-        elif(tries1 < 3):
-            logger.critical("Retrying img to vid conversion")
-            tries1 += 1
-            time.sleep(240) # Give time for the failed ffmpeg process to terminate
-        else:
-            logger.critical("Transcode failed, exiting...")
-            exit(1)
+        try:
+            img_to_vid(img_path, decision_vector)
+            break
+        except:
+            if(tries1 < 3):
+                logger.critical("Retrying img to vid conversion")
+                tries1 += 1
+                time.sleep(240) # Give time for the failed ffmpeg process to terminate
+            else:
+                logger.critical("Transcode failed, exiting...")
+                exit(1)
     while(True):
-        if(vid_to_img(output_dir)): break
-        elif(tries2 < 3):
-            logger.critical("Retrying vid to img conversion")
-            tries2 += 1
-            time.sleep(240) # Give time for the failed ffmpeg process to terminate
-        else:
-            logger.critical("Transcode failed, exiting...")
-            exit(1)
+        try:
+            vid_to_img(output_dir)
+            break
+        except:
+            if(tries2 < 3):
+                logger.critical("Retrying vid to img conversion")
+                tries2 += 1
+                time.sleep(240) # Give time for the failed ffmpeg process to terminate
+            else:
+                logger.critical("Transcode failed, exiting...")
+                exit(1)
 
     vid_size = os.path.getsize(cfg.TEMP_STORAGE_PATH)
 

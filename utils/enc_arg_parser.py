@@ -22,42 +22,45 @@ def get_codec_args(decision_vector):
     for key in cfg.opt_constants.keys():
         output_args[key] = cfg.opt_constants[key]
 
+    # Add each coding parameter to the output arguments that FFMPEG will use
     for i in range(0, len(cfg.opt_params)):
         arg_val = None
         param_name = cfg.opt_params[i]
         if cfg.opt_type[i] == "c":
+            # Categorical coding parameter value
             vector_val = int(round(decision_vector[i]))
             arg_val = cfg.opt_cat_values[param_name][vector_val]
         elif cfg.opt_type[i] == "i":
+            # Integer coding parameter value
             arg_val = int(round(decision_vector[i]))
         else:
+            # Float coding parameter value
             arg_val = decision_vector[i]
-        logger.debug("Adding encoding argument:  Param_name: " + param_name +
-        " arg_val: " + str(arg_val))
+        logger.debug("Adding encoding argument:  Param_name: " + param_name + " arg_val: " + str(arg_val))
         output_args[param_name] = arg_val
 
 
+    # Add Mega Si prefix for bitrate parameters
     if 'b:v' in output_args: output_args['b:v'] = str(output_args['b:v'])+"M"
 
 
 
     # Set the conditional arguments
-    if(cfg.video_encoder == "h264_nvenc"): return get_h264_nvenc_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "hevc_nvenc"): return get_hevc_nvenc_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "libx264rgb" or cfg.video_encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
+    if(cfg.video_encoder == "h264_nvenc" or
+       cfg.video_encoder == "hevc_nvenc"): return get_nvenc_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "h264_vaapi" or
+         cfg.video_encoder == "hevc_vaapi" or
+         cfg.video_encoder == "vp9_vaapi"): return get_vaapi_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "libx264"): return get_libx264_args(input_args, output_args, decision_vector)
     elif(cfg.video_encoder == "libx265"): return get_libx265_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "h264_vaapi"): return get_h264_vaapi_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "hevc_vaapi"): return get_hevc_vaapi_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "vp9_vaapi"): return get_vp9_vaapi_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "libvpx-vp9"): return get_libvpxvp9_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "libaom-av1"): return get_libaomav1_args(input_args, output_args, decision_vector)
-    elif(cfg.video_encoder == "libsvt_av1"): return get_libaomav1_args(input_args, output_args, decision_vector)
+    elif(cfg.video_encoder == "libsvt_av1"): return get_svtav1_args(input_args, output_args, decision_vector)
     else: raise Exception("Could not find codec")
 
 
 
 def get_libx264_args(input_args, output_args, x):
-    
+    '''Gets the input and output arguments for the libx264 FFMPEG-encoder'''
+
     is_two_pass = False
 
     # Constant bitrate with constrained encoding
@@ -77,9 +80,6 @@ def get_libx264_args(input_args, output_args, x):
         del output_args["pass"]
         del output_args["bufratio"]
 
-
-
-        
 
     if cfg.rate_control != "Near-LL":
         # Adjust parameters according to compatability
@@ -102,13 +102,12 @@ def get_libx264_args(input_args, output_args, x):
     except Exception:
         logger.debug("No deblock parameter found, continuing...")
 
-
     return input_args, output_args, is_two_pass
 
 
 
 def get_libx265_args(input_args, output_args, x):
-
+    '''Gets the input and output arguments for the libx265 FFMPEG-encoder'''
     # Remove tune flag if no tuning parameter is passed
     try:
         if(output_args["tune"] == "none"): del output_args["tune"]
@@ -151,25 +150,20 @@ def get_libx265_args(input_args, output_args, x):
     return input_args, output_args, is_two_pass
 
 
-def get_h264_nvenc_args(input_args, output_args, x):
-    # Add hardware decoding flag
-    input_args["hwaccel"] = "nvdec"
-    # NVENC handles two-pass internally, hence returning False
-
+def get_nvenc_args(input_args, output_args, x):
+    '''Gets the input and output arguments for the nvenc FFMPEG-encoders'''
+    
+    input_args["hwaccel"] = "nvdec" # Add hardware decoding flag
+    
     # Handle incompatible parameter combination
     if output_args["b_ref_mode"] == "2": output_args["weighted_pred"] = 0
     
     return input_args, output_args, False
 
 
-def get_hevc_nvenc_args(input_args, output_args, x):
-    # Add hardware decoding flag
-    input_args["hwaccel"] = "nvdec"
-    # NVENC handles two-pass internally, hence returning False
-    return input_args, output_args, False
 
-
-def get_h264_vaapi_args(input_args, output_args, x):
+def get_vaapi_args(input_args, output_args, x):
+    '''Gets the input and output arguments for the vaapi FFMPEG-encoders'''
     input_args = apply_vaapi_input_args(input_args)
     output_args["filter_hw_device"] = "foo"
     output_args["vf"] = "format=nv12|vaapi,hwupload"
@@ -185,47 +179,8 @@ def get_h264_vaapi_args(input_args, output_args, x):
     return input_args, output_args, False
 
 
-def get_hevc_vaapi_args(input_args, output_args, x):
-    input_args = apply_vaapi_input_args(input_args)
-    output_args["filter_hw_device"] = "foo"
-    output_args["vf"] = "format=nv12|vaapi,hwupload"
-    if 'b:v' in output_args: 
-        if output_args["rc_mode"] == "CBR":
-            output_args["maxrate"] = output_args ["b:v"]
-        try:
-            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
-        except Exception:
-            logger.critical("Could not set buffer size, quitting...")
-            exit(1)
-        del output_args["bufratio"]
-        
-    return input_args, output_args, False
-
-
-def get_vp9_vaapi_args(input_args, output_args, x):
-    input_args = apply_vaapi_input_args(input_args)
-    output_args["filter_hw_device"] = "foo"
-    output_args["vf"] = "format=nv12|vaapi,hwupload"
-    if 'b:v' in output_args: 
-        if output_args["rc_mode"] == "CBR":
-            output_args["maxrate"] = output_args ["b:v"]
-        try:
-            output_args["bufsize"] = str(round(float(x[0])*float(output_args["bufratio"]), 7)) + "M"
-        except Exception:
-            logger.critical("Could not set buffer size, quitting...")
-            exit(1)
-        del output_args["bufratio"]
-    return input_args, output_args, False
-
-
-def get_libvpxvp9_args(input_args, output_args, x):
-    is_two_pass = False
-    if output_args["pass"]=="2": is_two_pass = True
-    del output_args["pass"]
-    return input_args, output_args, is_two_pass
-
-
-def get_libaomav1_args(input_args, output_args, x):
+def get_svtav1_args(input_args, output_args, x):
+    '''Gets the input and output arguments for the libsvt-av1 FFMPEG-encoder'''
     return input_args, output_args, False
 
 

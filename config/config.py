@@ -11,49 +11,56 @@ Constants are all caps, variables are all lower case.
 
 OUTPUT_BASE = "output"
 LOG_PATH = OUTPUT_BASE + "/logs/"
+RESULTS_PATH = OUTPUT_BASE + "/results/"
 POPULATION_PICKLE_PATH = OUTPUT_BASE + "/population.p"
 CLI_VERBOSITY = "INFO"  # ERROR, WARNING, INFO, DEBUG
 
-# gen-alg parameters
+
+# Optimisation configuration
+ML_MODEL = "hrnet"
 POP_SIZE = 4 * 4    # must be a multiple of 4 and larger than 5!
-NO_GENERATIONS = 1
-MOG_ALGS = ["nsga2"]   # nsga2, nspso, moead
+NO_GENERATIONS = 10
+MOG_ALG = "nsga2"   # nsga2, nspso, moead
 EPOCHS = 1
-PLOT_PATH = OUTPUT_BASE + "/results/"
-FITNESS_DATA_PATH = OUTPUT_BASE + "/results/"
 
-ML_PERFORMANCE_BASELINE = 0.8162191842797382
-#ML_PERFORMANCE_BASELINE = 0.806058279492062
-ML_PERFORMANCE_MEASURE = "mean_IoU"
-#ML_PERFORMANCE_MEASURE = "mean_iu"
-
-ML_DATA_BASE = "data"
-# optimization_problem parameters
-#ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/scenario_suites/"
-#ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/scenario_suites_gn0,0005_gb0,5"
-ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/untouched_tiny/"
-ML_DATA_OUTPUT = ML_DATA_BASE + "/HRNet-mldata/cityscapes/leftImg8bit/val/"
-#ML_DATA_OUTPUT = ML_DATA_BASE + "/GSCNN-mldata/cityscapes/leftImg8bit_trainvaltest/leftImg8bit/val/"
+# Encoder/s and rate control/s to optimise for
 VIDEO_ENCODERS = ["libx264"]
-RATE_CONTROLS = { "h264_nvenc": ["CBR"],
-                 "hevc_nvenc": ["CBR"],
-                 "libx264":    ["ABR"],
-                 "libx264rgb": ["ABR"],
-                 "libx265":    ["ABR"],
-                 "h264_vaapi": ["CBR"],
+RATE_CONTROLS = {"h264_nvenc": ["CQP"],
+                 "hevc_nvenc": ["CQP"],
+                 "libx264":    ["CRF"],
+                 "h264_vaapi": ["CQP"],
                  "hevc_vaapi": ["CQP"],
                  "vp9_vaapi": ["CBR"],
-                 "libvpx-vp9": ["CBR"],
-                 "libaom-av1": ["CBR"],
-                 "libsvt_av1": ["CBR"] }
+                 "libsvt_av1": ["CQP"] }
 
-# ffmpeg_utils parameters
-TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
-IMAGE_TYPE = "png"
-NAMING_SCHEME =  '%06d'  # imgtype=png & scheme='%d' --> 1.png, 2.png, 3.png...
-IMG_COMP_LVL = 1
 
-JSON_PARAM_PATH_BASE = "config/encoding_parameters"
+# optimization_problem parameters
+ML_DATA_BASE = "data"
+ML_DATA_INPUT = ML_DATA_BASE + "/Cityscapes-dataset/validation_set/"
+
+ML_DATA_EVAL_INPUT = {
+    "nondeg": ML_DATA_BASE + "/Cityscapes-dataset/eval/val_situations/",
+    "rain": ML_DATA_BASE + "/Cityscapes-dataset/eval/val_situations_rain_light/",
+    "noise": ML_DATA_BASE + "/Cityscapes-dataset/eval/val_situations_noise/",
+    "moving": ML_DATA_BASE + "/Cityscapes-dataset/eval/val_situations_moving/"
+}
+
+ML_MODEL_PARAMS = {
+    "hrnet": {
+        "ML_PERFORMANCE_BASELINE": 0.8162191842797382,
+        "ML_PERFORMANCE_MEASURE": "mean_IoU",
+        "ML_DATA_OUTPUT": ML_DATA_BASE + "/HRNet-mldata/cityscapes/leftImg8bit/val/"
+    },
+    "gscnn": {
+        "ML_PERFORMANCE_BASELINE": 0.806058279492062,
+        "ML_PERFORMANCE_MEASURE": "mean_iu",
+        "ML_DATA_OUTPUT": ML_DATA_BASE + "/GSCNN-mldata/cityscapes/leftImg8bit_trainvaltest/leftImg8bit/val/"
+    }
+}
+
+ML_PERFORMANCE_BASELINE = ML_MODEL_PARAMS[ML_MODEL]["ML_PERFORMANCE_BASELINE"]
+ML_PERFORMANCE_MEASURE = ML_MODEL_PARAMS[ML_MODEL]["ML_PERFORMANCE_MEASURE"]
+ML_DATA_OUTPUT = ML_MODEL_PARAMS[ML_MODEL]["ML_DATA_OUTPUT"]
 
 
 # rest_communication parameters
@@ -61,10 +68,18 @@ ML_ADDRESS = "http://localhost:5001"
 REQUEST_ADDRESS = ML_ADDRESS + "/eval" 
 
 
+# ffmpeg_utils parameters
+TEMP_STORAGE_PATH = "/tmp/temp.mp4" # change to tmp/temp.mp4 to use system drive instead of /tmp - tmpfs mount
+IMAGE_TYPE = "png"
+NAMING_SCHEME =  '%06d'  # imgtype=png & scheme='%d' --> 1.png, 2.png, 3.png...
+IMG_COMP_LVL = 1
+JSON_PARAM_PATH_BASE = "config/encoding_parameters"
+
+
+
 # Global variables
 timestamp = None
 epoch = None
-mog_alg = None
 
 # Optimisation parameters
 opt_params = None
@@ -116,6 +131,11 @@ def load_params_from_json(encoder, r_control):
     logger.debug("Params loaded: " + str(opt_params))
 
 
+def get_random_seed(ep):
+    '''An arbitrary but repeatable randomisation seed'''
+    return ep*3+1
+
+
 def configure_logging():
     '''
     Configures the logging of information in logfiles and in CLIs.
@@ -124,9 +144,10 @@ def configure_logging():
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     # Check/prepare directories for storing data from this session
-    if not os.path.isdir(PLOT_PATH): os.mkdir(PLOT_PATH) 
+    if not os.path.isdir(OUTPUT_BASE): os.mkdir(OUTPUT_BASE) 
+    if not os.path.isdir(RESULTS_PATH): os.mkdir(RESULTS_PATH) 
     if not os.path.isdir(LOG_PATH): os.mkdir(LOG_PATH)
-    if not os.path.isdir(PLOT_PATH + timestamp): os.mkdir(PLOT_PATH + timestamp)
+    if not os.path.isdir(RESULTS_PATH + timestamp): os.mkdir(RESULTS_PATH + timestamp)
 
     # create logger
     logger = logging.getLogger('gen-alg')

@@ -136,7 +136,7 @@ class sweetspot_problem:
 
             # Name used to identify plots and files
             name = (cfg.video_encoder + ":" + cfg.rate_control + " at epoch:" +
-                    str(cfg.epoch) + " of MOGA: " + cfg.mog_alg)
+                    str(cfg.epoch) + " of MOGA: " + cfg.MOG_ALG)
 
             # If this is the last generation, plot and print extended epoch information
             if(self.gen == cfg.NO_GENERATIONS):
@@ -151,14 +151,16 @@ class sweetspot_problem:
 
 
     def update_data_csv(self, x, fitness, time, full_response):
-        with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/data.csv', mode='a') as data_file:
+        '''Update data csv file with optimisation progress information'''
+        with open(cfg.RESULTS_PATH + cfg.timestamp + '/data.csv', mode='a') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.mog_alg, np.array2string(x, precision = 6, separator=','), str(time)]
+            data = [str(self.calls), str(cfg.epoch), cfg.video_encoder, cfg.MOG_ALG, np.array2string(x, precision = 6, separator=','), str(time)]
             data = np.concatenate((data, fitness), axis=None)
             data = np.concatenate((data, str(full_response)), axis=None)
             data_writer.writerow(data)
 
     def write_ndf_csv(self, name):
+        '''Write a csv file that contains the non dominated vectors of the optimisation'''
         fitness_keys = [ key for key in self.fitness_dict.keys() ]
         fitness_values = [ val for val in self.fitness_dict.values() ]
         _, _, dc, ndr  = pyg.fast_non_dominated_sorting(fitness_values)
@@ -168,7 +170,7 @@ class sweetspot_problem:
         pl.plot_front(name +" all fits", fitness_values, ndf)
         
         # Save ndf results to file
-        with open(cfg.FITNESS_DATA_PATH + cfg.timestamp + '/NDF-' + name + '.csv', mode='w') as data_file:
+        with open(cfg.RESULTS_PATH + cfg.timestamp + '/NDF-' + name + '.csv', mode='w') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in ndf:
                 data = np.concatenate((fitness_keys[i], fitness_values[i]), axis=None)

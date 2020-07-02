@@ -1,19 +1,8 @@
 # By: Oscar Andersson (github.com/oscarA1994)
 
-# Changes to ffmpeg docker code:
-# The ffmpeg build is mainly based on the jrottenberg/nvidia dockerfile but has code
-# from the jrottenberg/vaapi docker file which enables vaapi.
-
-# Addition: Setup for the MOGA-encode optimisation algorithm is included at the end of this file.
-
-
 FROM openvisualcloud/xeon-centos76-media-ffmpeg
 
-
-
-###############################
-# Setup for the moga software #
-###############################
+# Setup for the moga software
 RUN yum update -y
 RUN yum install -y python3 python3-pip wget make git nano
 
